@@ -11,7 +11,7 @@
           [
             "OS==\"mac\"",
             {
-              "libraries": ["Foundation.framework", "AppKit.framework", "ScriptingBridge.framework"]
+              "libraries": ["Foundation.framework", "AppKit.framework"]
             }
           ]
         ]

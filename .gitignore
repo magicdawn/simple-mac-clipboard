@@ -10,5 +10,7 @@ coverage
 coverage.*
 
 build/
-bin/
 .vscode
+
+# include bin
+# bin/
