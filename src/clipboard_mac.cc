@@ -20,7 +20,9 @@ NSString* getStringArg(const Nan::FunctionCallbackInfo<Value>& info, int index) 
 
 NAN_METHOD(clearContents)
 {
+  #ifdef DEBUG
   NSLog(@"clearContents ...");
+  #endif
 
   // clear
   [NSPasteboard.generalPasteboard clearContents];
@@ -32,7 +34,9 @@ NAN_METHOD(setStringData)
 
   NSString* path = getStringArg(info, 0);
   NSString* format = getStringArg(info, 1);
+  #ifdef DEBUG
   NSLog(@"setStringData: path=%@, format=%@", path, format);
+  #endif
 
   // format
   [NSPasteboard.generalPasteboard declareTypes:@[format] owner:nil];
