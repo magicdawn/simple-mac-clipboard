@@ -7,7 +7,8 @@
     "test": "mocha",
     "test-cover": "nyc --reporter=lcov --reporter=text mocha",
     "report-cover": "codecov",
-    "build": "node-gyp rebuild"
+    "build-node": "node-gyp rebuild",
+    "build": "HOME=~/.electron-gyp node-gyp rebuild --target=6.1.3 --arch=x64 --dist-url=https://electronjs.org/headers"
   },
   "keywords": [],
   "author": "",

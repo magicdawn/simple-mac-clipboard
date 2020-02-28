@@ -28,6 +28,8 @@ NAN_METHOD(clearContents)
 
 NAN_METHOD(setStringData)
 {
+  NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+
   NSString* path = getStringArg(info, 0);
   NSString* format = getStringArg(info, 1);
   NSLog(@"setStringData: path=%@, format=%@", path, format);
@@ -39,6 +41,8 @@ NAN_METHOD(setStringData)
   NSData* pathData = [path dataUsingEncoding:NSUTF8StringEncoding];
   [NSPasteboard.generalPasteboard setData:pathData forType:format];
   NSLog(@"success writeToClipboard");
+
+  [pool drain];
 }
 
 void init(v8::Local<v8::Object> exports)
