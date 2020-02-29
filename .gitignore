@@ -15,5 +15,7 @@ coverage.*
 build/
 # electron-rebuild
 bin/
+
 # prebuild
 prebuilds
+.prebuildrc
