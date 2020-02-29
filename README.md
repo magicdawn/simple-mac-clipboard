@@ -15,7 +15,7 @@ $ npm i -S simple-mac-clipboard
 ## API
 
 ```js
-const simpleMacClipboard = require('simple-mac-clipboard')
+const clip = require('simple-mac-clipboard')
 ```
 
 - `clearContents`
