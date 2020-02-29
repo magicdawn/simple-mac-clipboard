@@ -14,7 +14,7 @@
   "scripts": {
     "install": "prebuild-install || node-gyp rebuild",
     "build-node": "node-gyp rebuild",
-    "build-electron": "electron-rebuild --version `electron -v`",
+    "build-electron": "npm_config_devdir=~/.electron-gyp node-gyp rebuild --arch=x64 --dist-url=https://electronjs.org/headers --target=`electron -v`",
     "test": "npm run build-electron && electron-mocha",
     "test-cover": "npm run build-node && nyc --reporter=lcov --reporter=text mocha",
     "report-cover": "codecov",

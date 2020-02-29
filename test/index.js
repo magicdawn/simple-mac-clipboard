@@ -26,4 +26,12 @@ describe('It works', () => {
     should(content).ok()
     content.should.equal(__filename)
   })
+
+  it('#setStringData error', () => {
+    // no args
+    clip.setStringData.should.throw(/wrong number/)
+
+    // not string
+    clip.setStringData.bind(null, 1, 'hello').should.throw(/arguments type does not match/)
+  })
 })

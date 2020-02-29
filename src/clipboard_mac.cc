@@ -35,20 +35,32 @@ NAN_METHOD(clearContents)
 
 NAN_METHOD(setStringData)
 {
+  if (info.Length() < 2)
+  {
+    Nan::ThrowTypeError("wrong number of arguments");
+    return;
+  }
+
+  if (!info[0]->IsString() || !info[0]->IsString())
+  {
+    Nan::ThrowTypeError("arguments type does not match (data: string, format: string) => void");
+    return;
+  }
+
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
-  NSString *path = getStringArg(info, 0);
+  NSString *data = getStringArg(info, 0);
   NSString *format = getStringArg(info, 1);
 #ifdef DEBUG
-  NSLog(@"setStringData: path=%@, format=%@", path, format);
+  NSLog(@"setStringData: data=%@, format=%@", data, format);
 #endif
 
   // format
   [NSPasteboard.generalPasteboard declareTypes:@[ format ] owner:nil];
 
   // setData
-  NSData *pathData = [path dataUsingEncoding:NSUTF8StringEncoding];
-  [NSPasteboard.generalPasteboard setData:pathData forType:format];
+  NSData *nsData = [data dataUsingEncoding:NSUTF8StringEncoding];
+  [NSPasteboard.generalPasteboard setData:nsData forType:format];
 #ifdef DEBUG
   NSLog(@"success writeToClipboard");
 #endif
