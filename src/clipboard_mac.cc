@@ -60,11 +60,12 @@ NAN_METHOD(setStringData)
 
   // setData
   NSData *nsData = [data dataUsingEncoding:NSUTF8StringEncoding];
-  [NSPasteboard.generalPasteboard setData:nsData forType:format];
+  BOOL success = [NSPasteboard.generalPasteboard setData:nsData forType:format];
 #ifdef DEBUG
-  NSLog(@"success writeToClipboard");
+  NSLog(@"writeToClipboard: result = %i", success);
 #endif
 
+  info.GetReturnValue().Set(Nan::New<v8::Boolean>(success));
   [pool drain];
 }
 #endif

@@ -3,12 +3,13 @@ const clip = require('..')
 const {clipboard} = require('electron')
 
 describe('It works', () => {
-  it('demo ', async () => {
+  it.skip('demo ', async () => {
     // hello
     // bin.hello('你好')
 
     // copyToClipboard
-    clip.setStringData('c.txt', 'public.utf8-plain-text')
+    const ret = clip.setStringData('c.txt', 'public.utf8-plain-text')
+    console.log(ret)
     clip.setStringData('/a/b/c.txt', 'public.file-url')
   })
 
@@ -19,7 +20,8 @@ describe('It works', () => {
 
   it('#setStringData', () => {
     // set
-    clip.setStringData(__filename, 'public.file-url')
+    const success = clip.setStringData(__filename, 'public.file-url')
+    success.should.equal(true)
 
     // read
     const content = clipboard.readBuffer('public.file-url').toString('utf8')

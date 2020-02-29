@@ -5,4 +5,4 @@ expectType<void>(clip.clearContents())
 
 const data = 'the data to be write to clipboard'
 const format = 'public.utf8-plain-text'
-expectType<void>(clip.setStringData(data, format))
+expectType<boolean>(clip.setStringData(data, format))
