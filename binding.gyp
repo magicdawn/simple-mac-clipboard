@@ -18,7 +18,7 @@
       },
       "xcode_settings": {
         "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
-        "OTHER_CFLAGS": ["-x objective-c++ -stdlib=libc++"]
+        "OTHER_CFLAGS": ["-x objective-c++ -stdlib=libc++ -mmacosx-version-min=10.9"]
       }
     }
   ]

@@ -5,4 +5,5 @@ const bin = require('bindings')('native_clipboard')
 
 // copyToClipboard
 bin.clearContents()
+bin.setStringData('c.txt', 'public.utf8-plain-text')
 bin.setStringData('/a/b/c.txt', 'public.file-url')
