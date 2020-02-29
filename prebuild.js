@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const abi = require('node-abi')
 const semver = require('semver')
 const {execSync} = require('child_process')

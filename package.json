@@ -3,7 +3,16 @@
   "version": "0.0.1",
   "description": "simple mac clipboard for node & electron",
   "main": "index.js",
+  "files": [
+    "src",
+    "index.js",
+    "binding.gyp",
+    "package.json",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "scripts": {
+    "install": "prebuild-install || node-gyp rebuild",
     "build-node": "node-gyp rebuild",
     "build-electron": "electron-rebuild --version `electron -v`",
     "test": "npm run build-electron && electron-mocha",
@@ -11,12 +20,17 @@
     "report-cover": "codecov",
     "gen-readme": "swig render ./readme/readme.md > README.md && prettier --write README.md"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "clip",
+    "clipboard",
+    "mac-clipboard"
+  ],
+  "author": "magicdawn",
+  "license": "MIT",
   "dependencies": {
     "bindings": "^1.5.0",
     "nan": "^2.14.0",
+    "node-gyp": "^6.1.0",
     "prebuild-install": "^5.3.3"
   },
   "devDependencies": {
@@ -45,5 +59,17 @@
       "prettier --write",
       "git add"
     ]
-  }
+  },
+  "gypfile": true,
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/magicdawn/simple-mac-clipboard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/magicdawn/simple-mac-clipboard/issues"
+  },
+  "homepage": "https://github.com/magicdawn/simple-mac-clipboard#readme"
 }
