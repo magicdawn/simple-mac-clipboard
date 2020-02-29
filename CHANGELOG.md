@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.1.1 2020-02-27
+
+- add return value for `setStringData`
+
 ## v0.1.0 2020-02-27
 
 - add parameter check, addon will throw TypeError when it's not right.
