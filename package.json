@@ -1,14 +1,15 @@
 {
   "name": "simple-mac-clipboard",
   "version": "0.0.1",
-  "description": "",
+  "description": "simple mac clipboard for node & electron",
   "main": "index.js",
   "scripts": {
     "build-node": "node-gyp rebuild",
     "build-electron": "electron-rebuild --version `electron -v`",
     "test": "npm run build-electron && electron-mocha",
     "test-cover": "npm run build-node && nyc --reporter=lcov --reporter=text mocha",
-    "report-cover": "codecov"
+    "report-cover": "codecov",
+    "gen-readme": "swig render ./readme/readme.md > README.md && prettier --write README.md"
   },
   "keywords": [],
   "author": "",

@@ -16,17 +16,10 @@
 $ npm i -S simple-mac-clipboard
 ```
 
-## API
 
-```js
-const clip = require('simple-mac-clipboard')
-```
+{% block extra %}
+{% endblock %}
 
-- `clearContents`
-- `setStringData(data, format)`
-
-和 NSPasteboard 提供的方法一样
-https://developer.apple.com/documentation/appkit/nspasteboard
 
 ## Changelog
 
