@@ -1,6 +1,6 @@
 {
-  "name": "native-clipboard",
-  "version": "1.0.0",
+  "name": "simple-mac-clipboard",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {

@@ -1,7 +1,7 @@
 {
   "targets": [
     {
-      "target_name": "native_clipboard",
+      "target_name": "simple_mac_clipboard",
       "sources": ["src/clipboard_mac.cc"],
       "cflags!": ["-fno-exceptions"],
       "cflags_cc!": ["-fno-exceptions"],

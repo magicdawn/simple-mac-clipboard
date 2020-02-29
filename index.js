@@ -1,2 +1,2 @@
-const bin = require('bindings')('native_clipboard')
+const bin = require('bindings')('simple_mac_clipboard')
 module.exports = bin
