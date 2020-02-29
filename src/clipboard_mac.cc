@@ -11,7 +11,8 @@
 using namespace std;
 using namespace v8;
 
-NSString* getStringArg(const Nan::FunctionCallbackInfo<Value>& info, int index) {
+NSString *getStringArg(const Nan::FunctionCallbackInfo<Value> &info, int index)
+{
   Nan::Utf8String valInUtf8String(info[index]);
   std::string valInStdString(*valInUtf8String);
   NSString *val = [NSString stringWithUTF8String:valInStdString.c_str()];
@@ -20,9 +21,9 @@ NSString* getStringArg(const Nan::FunctionCallbackInfo<Value>& info, int index) 
 
 NAN_METHOD(clearContents)
 {
-  #ifdef DEBUG
+#ifdef DEBUG
   NSLog(@"clearContents ...");
-  #endif
+#endif
 
   // clear
   [NSPasteboard.generalPasteboard clearContents];
@@ -30,21 +31,23 @@ NAN_METHOD(clearContents)
 
 NAN_METHOD(setStringData)
 {
-  NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
-  NSString* path = getStringArg(info, 0);
-  NSString* format = getStringArg(info, 1);
-  #ifdef DEBUG
+  NSString *path = getStringArg(info, 0);
+  NSString *format = getStringArg(info, 1);
+#ifdef DEBUG
   NSLog(@"setStringData: path=%@, format=%@", path, format);
-  #endif
+#endif
 
   // format
-  [NSPasteboard.generalPasteboard declareTypes:@[format] owner:nil];
+  [NSPasteboard.generalPasteboard declareTypes:@[ format ] owner:nil];
 
   // setData
-  NSData* pathData = [path dataUsingEncoding:NSUTF8StringEncoding];
+  NSData *pathData = [path dataUsingEncoding:NSUTF8StringEncoding];
   [NSPasteboard.generalPasteboard setData:pathData forType:format];
+#ifdef DEBUG
   NSLog(@"success writeToClipboard");
+#endif
 
   [pool drain];
 }
