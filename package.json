@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npm run build-node && mocha",
-    "test-cover": "npm run build-node && nyc --reporter=lcov --reporter=text mocha",
-    "report-cover": "codecov",
     "build-node": "node-gyp rebuild",
-    "build-electron": "electron-rebuild --version"
+    "build-electron": "electron-rebuild --version `electron -v`",
+    "test": "npm run build-electron && electron-mocha",
+    "test-cover": "npm run build-node && nyc --reporter=lcov --reporter=text mocha",
+    "report-cover": "codecov"
   },
   "keywords": [],
   "author": "",
