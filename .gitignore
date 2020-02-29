@@ -9,11 +9,11 @@ node_modules
 coverage
 coverage.*
 
+.vscode/
+
+# node-gyp
 build/
-.vscode
-
-# include bin
-# bin/
-
+# electron-rebuild
+bin/
 # prebuild
 prebuilds
