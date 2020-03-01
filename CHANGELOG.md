@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.3.0 2020-03-01
+
+- use `[NSData dataWithBytes]` insteadof `[NSData dataWithBytesNoCopy]` in `writeBuffer`,
+  the no-copy one make when `paste in electron apps` freeze
+
 ## v0.2.1 2020-03-01
 
 - I forget run `yarn gen-readme`, and I quit `npm-minor` process.
