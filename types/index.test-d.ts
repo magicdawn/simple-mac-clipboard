@@ -1,8 +1,19 @@
 import {expectType} from 'tsd'
 import * as clip from '..'
+const {
+  clear,
+  readBuffer,
+  readText,
+  writeBuffer,
+  writeText,
+  FORMAT_PLAIN_TEXT,
+  FORMAT_FILE_URL,
+} = clip
 
-expectType<void>(clip.clearContents())
+expectType<void>(clip.clear())
 
-const data = 'the data to be write to clipboard'
-const format = 'public.utf8-plain-text'
-expectType<boolean>(clip.setStringData(data, format))
+expectType<Buffer>(readBuffer(FORMAT_PLAIN_TEXT))
+expectType<string>(readText(FORMAT_PLAIN_TEXT))
+
+expectType<boolean>(writeBuffer(FORMAT_PLAIN_TEXT, Buffer.from(__filename)))
+expectType<boolean>(writeText(FORMAT_PLAIN_TEXT, __filename))

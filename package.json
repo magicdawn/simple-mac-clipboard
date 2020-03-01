@@ -17,7 +17,7 @@
     "install": "prebuild-install || node-gyp rebuild",
     "build-node": "node-gyp rebuild",
     "build-electron": "npm_config_devdir=~/.electron-gyp node-gyp rebuild --arch=x64 --dist-url=https://electronjs.org/headers --target=`electron -v`",
-    "test": "npm run build-electron --debug && electron-mocha",
+    "test": "npm run build-electron && electron-mocha",
     "test-cover": "npm run build-node && nyc --reporter=lcov --reporter=text mocha",
     "report-cover": "codecov",
     "gen-readme": "swig render ./readme/readme.md > README.md && prettier --write README.md"
