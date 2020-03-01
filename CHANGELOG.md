@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.2.1 2020-03-01
+
+- I forget run `yarn gen-readme`, and I quit `npm-minor` process.
+- so it's same to v0.2.0
+
 ## v0.2.0 2020-03-01
 
 - add support for `read` clipboard, add support for write Buffer data
