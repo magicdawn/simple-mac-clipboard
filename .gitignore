@@ -19,3 +19,6 @@ bin/
 # prebuild
 prebuilds
 .prebuildrc
+
+# test
+/demo.js

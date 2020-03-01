@@ -51,11 +51,17 @@ NAN_METHOD(setData) {
   // arg2: buf
   char *buf = node::Buffer::Data(info[1]);
   size_t length = node::Buffer::Length(info[1]);
-  NSData *data = [NSData dataWithBytesNoCopy:buf
-                                      length:(NSUInteger)length
-                                freeWhenDone:NO];
+
+  // no copy
+  // this will cause electron app to freeze, don't know why
+  // NSData *data = [NSData dataWithBytesNoCopy:buf
+  //                                     length:(NSUInteger)length
+  //                               freeWhenDone:NO];
+
+  // copy
+  NSData *data = [NSData dataWithBytes:buf length:(NSUInteger)length];
 #ifdef DEBUG
-  NSLog(@"setData: format=%@, buf.length=%@", format, length);
+  NSLog(@"setData: format=%@, buf.length=%zu", format, length);
 #endif
 
   // format
