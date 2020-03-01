@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.2.0 2020-03-01
+
+- add support for `read` clipboard, add support for write Buffer data
+- refactor function names to `clear` & `readBuffer/writeBuffer` & `readText/writeText`
+
 ## v0.1.1 2020-02-27
 
 - add return value for `setStringData`
