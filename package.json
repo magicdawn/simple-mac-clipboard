@@ -13,6 +13,10 @@
     "README.md",
     "CHANGELOG.md"
   ],
+  "binary": {
+    "host": "https://cdn.jsdelivr.net/gh/magicdawn/prebuild-binary@master",
+    "remote_path": "files/{name}/v{version}"
+  },
   "scripts": {
     "install": "prebuild-install || node-gyp rebuild",
     "build-node": "node-gyp rebuild",
