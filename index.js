@@ -1,4 +1,22 @@
-const bin = require('bindings')('simple_mac_clipboard')
+const tryRelease = () => {
+  try {
+    // prevent webpack error
+    const type = 'Release'
+    return require(`./build/${type}/simple_mac_clipboard.node`)
+  } catch (e) {
+    //  noop
+  }
+}
+const tryDebug = () => {
+  try {
+    // prevent webpack error
+    const type = 'Debug'
+    return require(`./build/${type}/simple_mac_clipboard.node`)
+  } catch (e) {
+    //  noop
+  }
+}
+const bin = tryRelease() || tryDebug() || require('bindings')('simple_mac_clipboard')
 const {path, clearContents, dataForType, setData} = bin
 
 // alias
