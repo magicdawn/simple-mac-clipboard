@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.3.1 2020-03-02
+
+- use jsdelivr as binary host
+
 ## v0.3.0 2020-03-01
 
 - use `[NSData dataWithBytes]` insteadof `[NSData dataWithBytesNoCopy]` in `writeBuffer`,
