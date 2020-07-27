@@ -15,14 +15,15 @@
   ],
   "binary": {
     "host": "https://cdn.jsdelivr.net/gh/magicdawn/prebuild-binary@master",
-    "remote_path": "files/{name}/v{version}"
+    "remote_path": "files/{name}/v{version}",
+    "napi_versions": [
+      3
+    ]
   },
   "scripts": {
-    "install": "prebuild-install || node-gyp rebuild",
-    "build-node": "node-gyp rebuild",
-    "build-electron": "npm_config_devdir=~/.electron-gyp node-gyp rebuild --arch=x64 --dist-url=https://electronjs.org/headers --target=`electron -v`",
-    "test": "npm run build-electron && electron-mocha",
-    "test-with-debug": "npm run build-electron --debug && electron-mocha",
+    "install": "prebuild-install -r napi || node-gyp rebuild",
+    "test": "npm run install && electron-mocha",
+    "test-with-debug": "npm run install --debug && electron-mocha",
     "test-cover": "npm run build-node && nyc --reporter=lcov --reporter=text mocha",
     "report-cover": "codecov",
     "gen-readme": "swig render ./readme/readme.md > README.md && prettier --write README.md"
@@ -37,6 +38,7 @@
   "dependencies": {
     "bindings": "^1.5.0",
     "nan": "^2.14.0",
+    "node-addon-api": "^3.0.0",
     "node-gyp": "^6.1.0",
     "prebuild-install": "^5.3.3"
   },

@@ -1,9 +1,5 @@
 #include <iostream>
-
-#include <nan.h>
-#include <node.h>
-#include <node_buffer.h>
-#include <v8.h>
+#include <napi.h>
 
 #ifdef __APPLE__
 #import <AppKit/AppKit.h>
@@ -13,35 +9,40 @@
 #endif
 
 using namespace std;
-using namespace v8;
+using namespace Napi;
 
 #ifdef __APPLE__
-NSString *getStringArg(const Nan::FunctionCallbackInfo<Value> &info,
-                       int index) {
-  Nan::Utf8String valInUtf8String(info[index]);
-  std::string valInStdString(*valInUtf8String);
+NSString *getStringArg(const CallbackInfo &info, int index) {
+  Napi::String s = info[index].ToString();
+  std::string valInStdString(s);
   NSString *val = [NSString stringWithUTF8String:valInStdString.c_str()];
   return val;
 }
 
-NAN_METHOD(clearContents) {
+Value clearContents(const CallbackInfo &info) {
 #ifdef DEBUG
   NSLog(@"clearContents ...");
 #endif
 
   // clear
   [NSPasteboard.generalPasteboard clearContents];
+
+  return info.Env().Undefined();
 }
 
-NAN_METHOD(setData) {
+Value setData(const CallbackInfo &info) {
+  Env env = info.Env();
+
   if (info.Length() < 2) {
-    Nan::ThrowTypeError("wrong number of arguments");
-    return;
+    Napi::Error::New(env, "wrong number of arguments")
+        .ThrowAsJavaScriptException();
+    return env.Undefined();
   }
-  if (!info[0]->IsString() || !info[1]->IsObject()) {
-    Nan::ThrowTypeError(
-        "arguments type does not match (format: string, buf: Buffer)");
-    return;
+  if (!info[0].IsString() || !info[1].IsObject()) {
+    Napi::Error::New(
+        env, "arguments type does not match (format: string, buf: Buffer)")
+        .ThrowAsJavaScriptException();
+    return env.Undefined();
   }
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
@@ -49,8 +50,11 @@ NAN_METHOD(setData) {
   NSString *format = getStringArg(info, 0);
 
   // arg2: buf
-  char *buf = node::Buffer::Data(info[1]);
-  size_t length = node::Buffer::Length(info[1]);
+  // char *buf = node::Buffer::Data(info[1]);
+  // size_t length = node::Buffer::Length(info[1]);
+  Buffer<uint8_t> b = info[1].As<Buffer<uint8_t>>();
+  uint8_t *buf = b.Data();
+  size_t length = b.Length();
 
   // no copy
   // this will cause electron app to freeze, don't know why
@@ -73,45 +77,50 @@ NAN_METHOD(setData) {
   NSLog(@"writeToClipboard: result = %i", success);
 #endif
 
-  info.GetReturnValue().Set(Nan::New<v8::Boolean>(success));
   [pool drain];
+  return Napi::Boolean::New(env, success);
 }
 
-NAN_METHOD(dataForType) {
+Value dataForType(const CallbackInfo &info) {
+  Env env = info.Env();
+
   if (info.Length() < 1) {
-    Nan::ThrowTypeError("wrong number of arguments");
-    return;
+    Napi::Error::New(env, "wrong number of arguments")
+        .ThrowAsJavaScriptException();
+    return env.Undefined();
   }
-  if (!info[0]->IsString()) {
-    Nan::ThrowTypeError("string expected");
-    return;
+  if (!info[0].IsString()) {
+    Napi::Error::New(env, "string expected").ThrowAsJavaScriptException();
+    return env.Undefined();
   }
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
   NSString *dataType = getStringArg(info, 0);
   NSData *data = [NSPasteboard.generalPasteboard dataForType:dataType];
-  char *pData = (char *)data.bytes;
+  uint8_t *pData = (uint8_t *)data.bytes;
   uint32_t len = (uint32_t)data.length;
-  v8::Local<v8::Object> ret = Nan::CopyBuffer(pData, len).ToLocalChecked();
+  Napi::Buffer<uint8_t> buf = Napi::Buffer<uint8_t>::Copy(env, pData, len);
 
-  info.GetReturnValue().Set(ret);
   [pool drain];
+  return buf;
 }
-
 #endif
 
-void init(v8::Local<v8::Object> exports) {
-  Nan::HandleScope scope;
+Object Init(Env env, Object exports) {
+  HandleScope scope(env);
 #ifdef __APPLE__
   // clear
-  Nan::SetMethod(exports, "clearContents", clearContents);
+  exports.Set(String::New(env, "clearContents"),
+              Function::New(env, clearContents));
 
   // write
-  Nan::SetMethod(exports, "setData", setData);
+  exports.Set(String::New(env, "setData"), Function::New(env, setData));
 
   // read
-  Nan::SetMethod(exports, "dataForType", dataForType);
+  exports.Set(String::New(env, "dataForType"), Function::New(env, dataForType));
 #endif
+
+  return exports;
 }
 
-NODE_MODULE(NODE_GYP_MODULE_NAME, init)
+NODE_API_MODULE(NODE_GYP_MODULE_NAME, Init)
