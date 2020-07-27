@@ -1,6 +1,6 @@
 {
   "name": "simple-mac-clipboard",
-  "version": "0.3.2",
+  "version": "1.0.0",
   "description": "simple mac clipboard for node & electron",
   "main": "index.js",
   "types": "types/index.d.ts",
