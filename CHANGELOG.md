@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.0.0 2020-07-27
+
+- use N-API
+
 ## v0.3.2 2020-03-02
 
 - fix webpack usage
