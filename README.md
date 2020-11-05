@@ -12,6 +12,10 @@
 $ npm i -S simple-mac-clipboard
 ```
 
+## Related
+
+https://github.com/electron/electron/issues/9035
+
 ## API
 
 > based on https://developer.apple.com/documentation/appkit/nspasteboard
