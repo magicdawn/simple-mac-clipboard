@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.0.1 2021-01-21
+
+- update prebuild-install to latest, in order to support electron@10
+
 ## v1.0.0 2020-07-27
 
 - use N-API
