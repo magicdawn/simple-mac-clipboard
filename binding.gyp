@@ -26,7 +26,12 @@
           [
             "OS==\"mac\"",
             {
-              "libraries": ["Foundation.framework", "AppKit.framework"]
+              "libraries": ["Foundation.framework", "AppKit.framework"],
+              "xcode_settings": {
+                  "OTHER_CFLAGS": [
+                      "-ObjC++"
+                  ]
+              }
             }
           ]
         ]
