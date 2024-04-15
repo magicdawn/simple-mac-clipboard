@@ -53,9 +53,11 @@
     "husky": "latest",
     "lint-staged": "latest",
     "mocha": "^10.4.0",
+    "node-abi": "^3.57.0",
     "nyc": "^15.1.0",
     "prebuild": "^13.0.0",
     "prettier": "latest",
+    "semver": "^7.6.0",
     "should": "^13.2.3",
     "tsd": "^0.31.0"
   },
