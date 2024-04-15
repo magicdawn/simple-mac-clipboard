@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.0.2 2024-04-16
+
+- update deps, especial node-gyp
+
 ## v1.0.1 2021-01-21
 
 - update prebuild-install to latest, in order to support electron@10
