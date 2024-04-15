@@ -81,5 +81,8 @@
   "bugs": {
     "url": "https://github.com/magicdawn/simple-mac-clipboard/issues"
   },
-  "homepage": "https://github.com/magicdawn/simple-mac-clipboard#readme"
+  "homepage": "https://github.com/magicdawn/simple-mac-clipboard#readme",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  }
 }
