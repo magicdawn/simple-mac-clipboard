@@ -8,13 +8,15 @@
       "include_dirs": [
         "<!@(node -p \"require('node-addon-api').include\")"
       ],
-      "sources": ["src/clipboard_mac.cc"],
-      "cflags!": ["-fno-exceptions"],
-      "cflags_cc!": ["-fno-exceptions"],
+      "sources": ["src/clipboard_mac.mm"],
       "xcode_settings": {
-        'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
-        'CLANG_CXX_LIBRARY': 'libc++',
-        "OTHER_CFLAGS": ["-x objective-c++ -mmacosx-version-min=10.9"]
+				"GCC_ENABLE_CPP_EXCEPTIONS": "YES",
+				"CLANG_CXX_LIBRARY": "libc++",
+				"CPP_FILE_TYPE": "sourcecode.cpp.objcpp",
+        "OTHER_CFLAGS_CC": [
+					"-x objective-c++",
+					"-mmacosx-version-min=10.9",
+				],
       },
       "msvs_settings": {
         "VCCLCompilerTool": {

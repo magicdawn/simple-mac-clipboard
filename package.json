@@ -37,27 +37,27 @@
   "license": "MIT",
   "dependencies": {
     "bindings": "^1.5.0",
-    "nan": "^2.14.0",
-    "node-addon-api": "^3.0.0",
-    "node-gyp": "^6.1.0",
-    "prebuild-install": "^6.0.0"
+    "nan": "^2.19.0",
+    "node-addon-api": "^8.0.0",
+    "node-gyp": "^10.1.0",
+    "prebuild-install": "^7.1.2"
   },
   "devDependencies": {
     "@magicdawn/eslint-config": "latest",
     "@magicdawn/prettier-config": "latest",
-    "codecov": "^3.3.0",
-    "electron": "^7.1.13",
-    "electron-mocha": "^8.2.1",
+    "codecov": "^3.8.2",
+    "electron": "^29.3.0",
+    "electron-mocha": "^12.3.0",
     "electron-rebuild": "^1.10.0",
-    "eslint": "^6.8.0",
+    "eslint": "^9.0.0",
     "husky": "latest",
     "lint-staged": "latest",
-    "mocha": "^6.1.4",
-    "nyc": "^14.0.0",
-    "prebuild": "^10.0.0",
+    "mocha": "^10.4.0",
+    "nyc": "^15.1.0",
+    "prebuild": "^13.0.0",
     "prettier": "latest",
     "should": "^13.2.3",
-    "tsd": "^0.11.0"
+    "tsd": "^0.31.0"
   },
   "husky": {
     "hooks": {

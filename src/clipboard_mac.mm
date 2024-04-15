@@ -2,9 +2,9 @@
 #include <napi.h>
 
 #ifdef __APPLE__
+#import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
 #import <CoreServices/CoreServices.h>
-#import <Foundation/Foundation.h>
 #import <objc/objc-runtime.h>
 #endif
 
