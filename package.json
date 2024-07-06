@@ -2,16 +2,22 @@
   "name": "simple-mac-clipboard",
   "version": "1.0.2",
   "description": "simple mac clipboard for node & electron",
-  "main": "index.js",
-  "types": "types/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
+  },
   "files": [
-    "src",
-    "index.js",
-    "types/index.d.ts",
+    "src-addon/",
+    "src-ts/",
+    "dist/",
     "binding.gyp",
     "package.json",
-    "README.md",
-    "CHANGELOG.md"
+    "README.md"
   ],
   "binary": {
     "host": "https://cdn.jsdelivr.net/gh/magicdawn/prebuild-binary@master",
@@ -21,10 +27,15 @@
     ]
   },
   "scripts": {
-    "install": "prebuild-install -r napi || node-gyp rebuild",
-    "test": "npm run install && electron-mocha",
-    "test-with-debug": "npm run install --debug && electron-mocha",
-    "test-cover": "npm run build-node && nyc --reporter=lcov --reporter=text mocha",
+    "dev": "tsup --watch",
+    "install": "prebuild-install -r napi || npm run build:addon",
+    "build:addon": "node-gyp rebuild",
+    "build:js": "tsup",
+    "build": "conc npm:build:*",
+    "test": "electron-mocha",
+    "prepublishOnly": "pnpm build && pnpm test",
+    "test-with-debug": "npm run build:addon --debug && electron-mocha",
+    "test-cover": "npm run test && nyc --reporter=lcov --reporter=text mocha",
     "report-cover": "codecov",
     "gen-readme": "swig render ./readme/readme.md > README.md && prettier --write README.md"
   },
@@ -37,7 +48,7 @@
   "license": "MIT",
   "dependencies": {
     "bindings": "^1.5.0",
-    "nan": "^2.19.0",
+    "nan": "^2.20.0",
     "node-addon-api": "^8.0.0",
     "node-gyp": "^10.1.0",
     "prebuild-install": "^7.1.2"
@@ -45,21 +56,26 @@
   "devDependencies": {
     "@magicdawn/eslint-config": "latest",
     "@magicdawn/prettier-config": "latest",
+    "@types/bindings": "^1.5.5",
+    "@types/node": "^20.14.10",
     "codecov": "^3.8.2",
-    "electron": "^29.3.0",
-    "electron-mocha": "^12.3.0",
+    "concurrently": "^8.2.2",
+    "electron": "^31.1.0",
+    "electron-mocha": "^12.3.1",
     "electron-rebuild": "^1.10.0",
-    "eslint": "^9.0.0",
+    "eslint": "^9.6.0",
     "husky": "latest",
     "lint-staged": "latest",
-    "mocha": "^10.4.0",
-    "node-abi": "^3.57.0",
-    "nyc": "^15.1.0",
-    "prebuild": "^13.0.0",
+    "mocha": "^10.6.0",
+    "node-abi": "^3.65.0",
+    "nyc": "^17.0.0",
+    "prebuild": "^13.0.1",
     "prettier": "latest",
-    "semver": "^7.6.0",
+    "semver": "^7.6.2",
     "should": "^13.2.3",
-    "tsd": "^0.31.0"
+    "tsd": "^0.31.1",
+    "tsup": "^8.1.0",
+    "typescript": "^5.5.3"
   },
   "husky": {
     "hooks": {
@@ -86,5 +102,6 @@
   "homepage": "https://github.com/magicdawn/simple-mac-clipboard#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
-  }
+  },
+  "packageManager": "pnpm@9.4.0+sha512.f549b8a52c9d2b8536762f99c0722205efc5af913e77835dbccc3b0b0b2ca9e7dc8022b78062c17291c48e88749c70ce88eb5a74f1fa8c4bf5e18bb46c8bd83a"
 }

@@ -21,4 +21,8 @@ prebuilds
 .prebuildrc
 
 # test
-/demo.js
+demo/
+
+# tsup build
+dist/
+

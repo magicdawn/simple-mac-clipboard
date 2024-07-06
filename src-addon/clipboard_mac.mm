@@ -2,9 +2,9 @@
 #include <napi.h>
 
 #ifdef __APPLE__
-#import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
 #import <CoreServices/CoreServices.h>
+#import <Foundation/Foundation.h>
 #import <objc/objc-runtime.h>
 #endif
 
@@ -34,14 +34,11 @@ Value setData(const CallbackInfo &info) {
   Env env = info.Env();
 
   if (info.Length() < 2) {
-    Napi::Error::New(env, "wrong number of arguments")
-        .ThrowAsJavaScriptException();
+    Napi::Error::New(env, "wrong number of arguments").ThrowAsJavaScriptException();
     return env.Undefined();
   }
   if (!info[0].IsString() || !info[1].IsObject()) {
-    Napi::Error::New(
-        env, "arguments type does not match (format: string, buf: Buffer)")
-        .ThrowAsJavaScriptException();
+    Napi::Error::New(env, "arguments type does not match (format: string, buf: Buffer)").ThrowAsJavaScriptException();
     return env.Undefined();
   }
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -85,8 +82,7 @@ Value dataForType(const CallbackInfo &info) {
   Env env = info.Env();
 
   if (info.Length() < 1) {
-    Napi::Error::New(env, "wrong number of arguments")
-        .ThrowAsJavaScriptException();
+    Napi::Error::New(env, "wrong number of arguments").ThrowAsJavaScriptException();
     return env.Undefined();
   }
   if (!info[0].IsString()) {
@@ -104,20 +100,60 @@ Value dataForType(const CallbackInfo &info) {
   [pool drain];
   return buf;
 }
+
+Value allDataForType(const CallbackInfo &info) {
+  Env env = info.Env();
+
+  if (info.Length() < 1) {
+    Napi::Error::New(env, "wrong number of arguments").ThrowAsJavaScriptException();
+    return env.Undefined();
+  }
+  if (!info[0].IsString()) {
+    Napi::Error::New(env, "string expected").ThrowAsJavaScriptException();
+    return env.Undefined();
+  }
+
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  NSString *dataType = getStringArg(info, 0);
+
+  std::vector<Napi::Buffer<uint8_t>> buffers;
+  NSArray<NSPasteboardItem *> *items = [NSPasteboard.generalPasteboard pasteboardItems];
+  for (NSPasteboardItem *item in items) {
+    // Get data for the specified type
+    NSData *data = [item dataForType:dataType];
+    if (data) {
+      uint8_t *pData = (uint8_t *)data.bytes;
+      uint32_t len = (uint32_t)data.length;
+      Napi::Buffer<uint8_t> buf = Napi::Buffer<uint8_t>::Copy(env, pData, len);
+      buffers.push_back(buf);
+    }
+  }
+
+  // Convert vector of buffers to JavaScript array
+  Array result = Array::New(env, buffers.size());
+  for (size_t i = 0; i < buffers.size(); ++i) {
+    result.Set(i, buffers[i]);
+  }
+
+  [pool drain];
+  return result;
+}
 #endif
 
 Object Init(Env env, Object exports) {
   HandleScope scope(env);
 #ifdef __APPLE__
   // clear
-  exports.Set(String::New(env, "clearContents"),
-              Function::New(env, clearContents));
+  exports.Set(String::New(env, "clearContents"), Function::New(env, clearContents));
 
   // write
   exports.Set(String::New(env, "setData"), Function::New(env, setData));
 
-  // read
+  // read first
   exports.Set(String::New(env, "dataForType"), Function::New(env, dataForType));
+
+  // read all
+  exports.Set(String::New(env, "allDataForType"), Function::New(env, allDataForType));
 #endif
 
   return exports;

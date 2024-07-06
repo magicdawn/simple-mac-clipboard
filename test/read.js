@@ -1,6 +1,7 @@
 const should = require('should')
-const {FORMAT_PLAIN_TEXT, clear, readBuffer, readText} = require('..')
-const {clipboard} = require('electron')
+const { FORMAT_PLAIN_TEXT, clear, readBuffer, readText, readTexts } = require('..')
+const { clipboard } = require('electron')
+const { execSync } = require('child_process')
 
 describe('.readBuffer', () => {
   it('it works', async () => {
@@ -41,5 +42,16 @@ describe('.readText', () => {
   it('it works ', () => {
     clipboard.writeText(__filename)
     readText(FORMAT_PLAIN_TEXT).should.equal(__filename)
+  })
+})
+
+describe('.readTexts works', () => {
+  it('it works ', () => {
+    // set multi-items
+    const cmd = `swift '${__dirname}/helpers/set-mul.swift'`
+    execSync(cmd)
+
+    // read
+    readTexts(FORMAT_PLAIN_TEXT).should.eql(['First string', 'Second string'])
   })
 })
