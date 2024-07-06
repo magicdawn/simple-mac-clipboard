@@ -24,3 +24,22 @@ export enum ClipboardFormat {
 export const FORMAT_PLAIN_TEXT = ClipboardFormat.PlainText
 export const FORMAT_FILE_URL = ClipboardFormat.FileUrl
 export const FORMAT_SOURCE_APP_BUNDLE_ID = ClipboardFormat.SourceAppBundleId
+
+const clip = {
+  addonPath,
+  clear,
+
+  writeBuffer,
+  readBuffer,
+  readBuffers,
+
+  writeText,
+  readText,
+  readTexts,
+
+  FORMAT_PLAIN_TEXT,
+  FORMAT_FILE_URL,
+  FORMAT_SOURCE_APP_BUNDLE_ID,
+}
+export default clip
+// SyntaxError: The requested module 'simple-mac-clipboard' does not provide an export named 'default'
