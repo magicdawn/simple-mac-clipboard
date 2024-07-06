@@ -37,6 +37,7 @@ const clip = {
   readText,
   readTexts,
 
+  ClipboardFormat,
   FORMAT_PLAIN_TEXT,
   FORMAT_FILE_URL,
   FORMAT_SOURCE_APP_BUNDLE_ID,
