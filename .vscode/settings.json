@@ -1,0 +1,11 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "apple-swift-format.onlyEnableWithConfig": true,
+  "[objective-cpp]": {
+    "editor.defaultFormatter": "xaver.clang-format",
+    "editor.inlayHints.enabled": "offUnlessPressed"
+  },
+  "[objective-c]": {
+    "editor.defaultFormatter": "xaver.clang-format"
+  }
+}
