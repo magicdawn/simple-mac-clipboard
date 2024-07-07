@@ -125,7 +125,7 @@ Value allDataForType(const CallbackInfo& info) {
 
     NSString *dataType = _getNSStringAt(info, 0);
 
-    std::vector<Napi::Buffer<uint8_t>> buffers;
+    std::vector<Buffer> buffers;
     NSArray<NSPasteboardItem *> *items = [NSPasteboard.generalPasteboard pasteboardItems];
     for (NSPasteboardItem *item in items) {
       // Get data for the specified type
