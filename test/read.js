@@ -20,8 +20,8 @@ describe('.readBuffer', () => {
   })
 
   it('when arguments error', async () => {
-    readBuffer.should.throw(/wrong number of arguments/)
-    readBuffer.bind(null, 1).should.throw(/string expected/)
+    readBuffer.should.throw(/arguments count mismatch/)
+    readBuffer.bind(null, 1).should.throw(/arguments type mismatch/)
   })
 
   it('when empty clipboard', async () => {

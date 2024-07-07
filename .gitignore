@@ -1,28 +1,36 @@
 logs
 *.log
 .DS_Store
-
 npm-debug.log*
 node_modules
-
 .nyc_output
 coverage
 coverage.*
 
 .vscode/
 
+#
+# addon
+#
+
 # node-gyp
-build/
-# electron-rebuild
-bin/
+/build/
 
 # prebuild
-prebuilds
+/prebuilds
 .prebuildrc
+
+# clangd cache
+/.cache
+
+# bear -- node-gyp rebuild
+compile_commands.json
+
+# electron-rebuild
+bin/
 
 # test
 demo/
 
 # tsup build
 dist/
-

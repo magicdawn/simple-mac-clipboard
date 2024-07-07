@@ -1,6 +1,6 @@
 const should = require('should')
-const {FORMAT_PLAIN_TEXT, clear, writeBuffer, writeText} = require('..')
-const {clipboard} = require('electron')
+const { FORMAT_PLAIN_TEXT, clear, writeBuffer, writeText } = require('..')
+const { clipboard } = require('electron')
 
 describe('.writeBuffer', () => {
   it('it works', () => {
@@ -20,10 +20,10 @@ describe('.writeBuffer', () => {
   })
 
   it('when arguments error', async () => {
-    writeBuffer.should.throw(/wrong number of arguments/)
-    writeBuffer.bind(null, 1).should.throw(/wrong number of arguments/)
-    writeBuffer.bind(null, 1, 1).should.throw(/arguments type does not match/)
-    writeBuffer.bind(null, FORMAT_PLAIN_TEXT, 1).should.throw(/arguments type does not match/)
+    writeBuffer.should.throw(/arguments count mismatch/)
+    writeBuffer.bind(null, 1).should.throw(/arguments count mismatch/)
+    writeBuffer.bind(null, 1, 1).should.throw(/arguments type mismatch/)
+    writeBuffer.bind(null, FORMAT_PLAIN_TEXT, 1).should.throw(/arguments type mismatch/)
   })
 })
 
