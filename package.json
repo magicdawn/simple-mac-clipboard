@@ -9,7 +9,8 @@
     ".": {
       "require": "./dist/index.js",
       "import": "./dist/index.mjs"
-    }
+    },
+    "./build/*": "./build/*"
   },
   "files": [
     "src-addon/",

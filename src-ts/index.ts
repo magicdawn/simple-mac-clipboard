@@ -25,7 +25,7 @@ export const FORMAT_PLAIN_TEXT = ClipboardFormat.PlainText
 export const FORMAT_FILE_URL = ClipboardFormat.FileUrl
 export const FORMAT_SOURCE_APP_BUNDLE_ID = ClipboardFormat.SourceAppBundleId
 
-const clip = {
+export const clip = {
   addonPath,
   clear,
 
