@@ -14,7 +14,7 @@ const sh = (cmd) => {
 const targets = abi.supportedTargets.filter((item) => {
   const { runtime, target, lts } = item
   if (runtime === 'node') {
-    return semver.gte(target, '16.0.0')
+    return semver.gte(target, '20')
   }
   if (runtime === 'electron') {
     return semver.gte(target, '20.0.0')
@@ -28,8 +28,8 @@ const electronVersions = targets
   .filter((item) => item.runtime === 'electron')
   .map((item) => item.target)
 
-const nodeCmd = `yarn prebuild -r node ${nodeVersions.map((v) => `-t ${v}`).join(' ')}`
-const electronCmd = `yarn prebuild -r electron ${electronVersions.map((v) => `-t ${v}`).join(' ')}`
+const nodeCmd = `pnpm prebuild -r node ${nodeVersions.map((v) => `-t ${v}`).join(' ')}`
+const electronCmd = `pnpm prebuild -r electron ${electronVersions.map((v) => `-t ${v}`).join(' ')}`
 
 // clean
 sh(`cd ${__dirname}`)
@@ -38,3 +38,10 @@ sh(`rm -rf ${__dirname + '/prebuilds'}`)
 // build
 sh(nodeCmd)
 sh(electronCmd)
+
+/**
+ * no need so complicate
+ * just run
+ * - `pnpm prebuild -r napi`
+ * - `pnpm prebuild`
+ */
