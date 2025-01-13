@@ -1,0 +1,10 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "stream",
+  "tasks": {
+    "dev:generate-compile_commands": {
+      "inputs": ["binding.gyp"],
+      "outputs": ["compile_commands.json"]
+    }
+  }
+}

@@ -34,3 +34,5 @@ demo/
 
 # tsup build
 dist/
+
+.turbo

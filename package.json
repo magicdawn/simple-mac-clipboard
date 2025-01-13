@@ -28,6 +28,7 @@
   },
   "scripts": {
     "dev": "tsup --watch",
+    "dev:generate-compile_commands": "bear -- node-gyp rebuild",
     "install": "prebuild-install -r napi || npm run build:addon",
     "build:addon": "node-gyp rebuild",
     "build:js": "tsup",
@@ -48,33 +49,34 @@
   "license": "MIT",
   "dependencies": {
     "bindings": "^1.5.0",
-    "node-addon-api": "^8.0.0",
-    "node-gyp": "^10.1.0",
+    "node-addon-api": "^8.3.0",
+    "node-gyp": "^11.0.0",
     "prebuild-install": "^7.1.2"
   },
   "devDependencies": {
     "@magicdawn/eslint-config": "latest",
     "@magicdawn/prettier-config": "latest",
     "@types/bindings": "^1.5.5",
-    "@types/node": "^20.14.10",
-    "codecov": "^3.8.2",
-    "concurrently": "^8.2.2",
-    "electron": "^31.1.0",
-    "electron-mocha": "^12.3.1",
-    "electron-rebuild": "^1.10.0",
-    "eslint": "^9.6.0",
+    "@types/node": "^22.10.5",
+    "codecov": "^3.8.3",
+    "concurrently": "^9.1.2",
+    "electron": "^33.3.1",
+    "electron-mocha": "^13.0.1",
+    "electron-rebuild": "^3.2.9",
+    "eslint": "^9.18.0",
     "husky": "latest",
     "lint-staged": "latest",
-    "mocha": "^10.6.0",
-    "node-abi": "^3.65.0",
-    "nyc": "^17.0.0",
+    "mocha": "^11.1.0",
+    "node-abi": "^3.71.0",
+    "nyc": "^17.1.0",
     "prebuild": "^13.0.1",
     "prettier": "latest",
-    "semver": "^7.6.2",
+    "semver": "^7.6.3",
     "should": "^13.2.3",
-    "tsd": "^0.31.1",
-    "tsup": "^8.1.0",
-    "typescript": "^5.5.3"
+    "tsd": "^0.31.2",
+    "tsup": "^8.3.5",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.3"
   },
   "husky": {
     "hooks": {
@@ -102,5 +104,5 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
-  "packageManager": "pnpm@9.4.0+sha512.f549b8a52c9d2b8536762f99c0722205efc5af913e77835dbccc3b0b0b2ca9e7dc8022b78062c17291c48e88749c70ce88eb5a74f1fa8c4bf5e18bb46c8bd83a"
+  "packageManager": "pnpm@9.15.3+sha512.1f79bc245a66eb0b07c5d4d83131240774642caaa86ef7d0434ab47c0d16f66b04e21e0c086eb61e62c77efc4d7f7ec071afad3796af64892fae66509173893a"
 }
