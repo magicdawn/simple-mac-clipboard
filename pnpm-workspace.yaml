@@ -1,0 +1,6 @@
+onlyBuiltDependencies:
+  - electron
+  - es5-ext
+  - esbuild
+  - lzma-native
+  - unrs-resolver
