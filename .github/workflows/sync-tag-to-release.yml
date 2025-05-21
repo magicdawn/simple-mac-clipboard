@@ -1,4 +1,7 @@
-name: sync-tag-to-release
+name: SyncTagToRelease
+
+permissions:
+  contents: write
 
 on:
   push:
@@ -21,8 +24,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'pnpm'
+          node-version: lts/*
+          cache: pnpm
 
       # 1. publish local
       # 2. push tag to github
