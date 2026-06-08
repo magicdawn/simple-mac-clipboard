@@ -9,7 +9,7 @@
 ## Install
 
 ```sh
-$ npm i -S simple-mac-clipboard
+$ pnpm add simple-mac-clipboard
 ```
 
 ## Related
