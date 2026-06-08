@@ -1,6 +1,8 @@
+#include <cstddef>
 #include <iostream>
 #include <napi.h>
 #include <sstream>
+#include <stdint.h>
 #include <string>
 #include <vector>
 
@@ -22,7 +24,7 @@ using Napi::Value;
 using Buffer = Napi::Buffer<uint8_t>;
 
 #ifdef __APPLE__
-NSString *_getNSStringAt(const CallbackInfo& info, int index) {
+NSString *_getNSStringAt(const CallbackInfo& info, size_t index) {
   std::string s = info[index].ToString().Utf8Value();
   return [NSString stringWithUTF8String:s.c_str()];
 }
@@ -39,13 +41,29 @@ void _validateArgs(const CallbackInfo& info, std::vector<std::string> expected) 
   for (size_t i = 0; i < expected.size(); i++) {
     if (expected[i] == "string" && !info[i].IsString()) {
       std::stringstream ss;
-      ss << "arguments type mismatch, argument " << i << " must be string";
+      ss << "arguments type mismatch, arguments[" << i << "] must be string";
       throw Napi::Error::New(info.Env(), ss.str());
     }
+
     if (expected[i] == "Buffer" && !info[i].IsBuffer()) {
       std::stringstream ss;
-      ss << "arguments type mismatch, argument " << i << " must be Buffer";
+      ss << "arguments type mismatch, arguments[" << i << "] must be Buffer";
       throw Napi::Error::New(info.Env(), ss.str());
+    }
+
+    if (expected[i] == "Array<Buffer>" || expected[i] == "Buffer[]") {
+      std::stringstream ss;
+      ss << "arguments type mismatch, arguments[" << i << "] must be Array<Buffer>";
+      if (!info[i].IsArray()) {
+        throw Napi::Error::New(info.Env(), ss.str());
+      }
+      Napi::Array arr = info[1].As<Napi::Array>();
+      for (uint32_t i = 0; i < arr.Length(); i++) {
+        Napi::Value val = arr[i];
+        if (!val.IsBuffer()) {
+          throw Napi::Error::New(info.Env(), ss.str());
+        }
+      }
     }
   }
 }
@@ -61,10 +79,8 @@ Napi::Value clearContents(const CallbackInfo& info) {
 #ifdef DEBUG
   NSLog(@"clearContents ...");
 #endif
-
   // clear
   [NSPasteboard.generalPasteboard clearContents];
-
   return info.Env().Undefined();
 }
 
@@ -98,6 +114,42 @@ Napi::Value setData(const CallbackInfo& info) {
 
     // setData
     bool success = [NSPasteboard.generalPasteboard setData:data forType:format];
+#ifdef DEBUG
+    NSLog(@"writeToClipboard: result = %i", success);
+#endif
+
+    return Napi::Boolean::New(env, success);
+  }
+}
+
+Napi::Value setDataAll(const CallbackInfo& info) {
+  @autoreleasepool {
+    _validateArgs(info, {"string", "Array<Buffer>"});
+    Env env = info.Env();
+
+    // arg1: format
+    NSString *format = _getNSStringAt(info, 0);
+
+    // arg2: buffers
+    Napi::Array arr = info[1].As<Napi::Array>();
+    NSMutableArray<NSPasteboardItem *> *items = [NSMutableArray arrayWithCapacity:arr.Length()];
+    for (uint32_t i = 0; i < arr.Length(); i++) {
+      Napi::Value val = arr.Get(i);
+      Buffer buf = val.As<Buffer>();
+      uint8_t *bufData = buf.Data();
+      size_t length = buf.Length();
+      NSData *data = [NSData dataWithBytes:bufData length:(NSUInteger)length];
+
+      NSPasteboardItem *item = [[NSPasteboardItem alloc] init];
+      [item setData:data forType:format];
+      [items addObject:item];
+    }
+#ifdef DEBUG
+    NSLog(@"setDataAll: format=%@, items.length=%lu", format, (unsigned long)items.count);
+#endif
+
+    [NSPasteboard.generalPasteboard clearContents];
+    bool success = [NSPasteboard.generalPasteboard writeObjects:items];
 #ifdef DEBUG
     NSLog(@"writeToClipboard: result = %i", success);
 #endif
@@ -153,16 +205,14 @@ Object Init(Env env, Object exports) {
   // clear
   exports.Set(String::New(env, "clearContents"), Function::New(env, clearContents));
 
+  // read
+  exports.Set(String::New(env, "dataForType"), Function::New(env, dataForType));
+  exports.Set(String::New(env, "allDataForType"), Function::New(env, allDataForType)); // array
+
   // write
   exports.Set(String::New(env, "setData"), Function::New(env, setData));
-
-  // read first
-  exports.Set(String::New(env, "dataForType"), Function::New(env, dataForType));
-
-  // read all
-  exports.Set(String::New(env, "allDataForType"), Function::New(env, allDataForType));
+  exports.Set(String::New(env, "setDataAll"), Function::New(env, setDataAll)); // array
 #endif
-
   return exports;
 }
 

@@ -6,12 +6,18 @@ export const addonPath = addon.path
 // base functions
 export const clear = addon.clearContents
 export const writeBuffer = addon.setData
+export const writeBuffers = addon.setDataAll
 export const readBuffer = addon.dataForType
 export const readBuffers = addon.allDataForType
 
 // convenient functions
 // format is the first parameter & required
 export const writeText = (format: string, text: string) => writeBuffer(format, Buffer.from(text))
+export const writeTexts = (format: string, texts: string[]) =>
+  writeBuffers(
+    format,
+    texts.map((t) => Buffer.from(t)),
+  )
 export const readText = (format: string) => readBuffer(format).toString('utf8')
 export const readTexts = (format: string) => readBuffers(format).map((buf) => buf.toString('utf8'))
 
@@ -30,10 +36,12 @@ export const clip = {
   clear,
 
   writeBuffer,
+  writeBuffers,
   readBuffer,
   readBuffers,
 
   writeText,
+  writeTexts,
   readText,
   readTexts,
 

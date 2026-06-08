@@ -33,6 +33,7 @@ export type Addon = {
   dataForType(format: string): Buffer
   allDataForType(format: string): Buffer[]
   setData(format: string, data: Buffer): boolean
+  setDataAll(format: string, datas: Buffer[]): boolean
 }
 
 export const addon: Addon = tryRelease() || tryDebug() || bindings('simple_mac_clipboard')
