@@ -37,23 +37,51 @@ export function clear(): void
 
 clear the clipboard
 
-### readBuffer & writeBuffer
+### `read`
 
 ```ts
+// single item
 export function readBuffer(format: string): Buffer
-export function writeBuffer(format: string, data: Buffer): boolean
+export function readText(format: string): string
+
+// items
+export function readBuffers(format: string): Buffer[]
+export function readTexts(format: string): string[]
 ```
 
-read or write `Buffer` from/to the clipboard
-
-### readText & writeText
+### `write`
 
 ```ts
-export function readText(format: string): string
+// single item
+export function writeBuffer(format: string, data: Buffer): boolean
 export function writeText(format: string, text: string): boolean
+
+// items
+export function writeBuffers(format: string, data: Buffer[]): boolean
+export function writeTexts(format: string, text: string[]): boolean
 ```
 
-read or write text from/to the clipboard
+### predefined `Formats`
+
+`FORMAT_PLAIN_TEXT` / `FORMAT_FILE_URL` / `FORMAT_SOURCE_APP_BUNDLE_ID`
+
+## read/write File Paths
+
+```ts
+import { FORMAT_FILE_URL, readTexts, writeTexts } from 'simple-mac-clipboard'
+import { fileURLToPath, pathToFileURL } from 'node:url'
+
+const filePaths = ['/tmp/a/b.txt', '/tmp/c']
+
+// write
+writeTexts(
+  FORMAT_FILE_URL,
+  filePaths.map((p) => pathToFileURL(p).href),
+)
+
+// read
+console.log(readTexts(FORMAT_FILE_URL).map((u) => fileURLToPath(u)))
+```
 
 ## Changelog
 
