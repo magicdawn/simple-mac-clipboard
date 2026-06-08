@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
+const { execSync } = require('node:child_process')
 const abi = require('node-abi')
 const semver = require('semver')
-const { execSync } = require('child_process')
 
 const sh = (cmd) => {
   console.log('[exec]: %s', cmd)
@@ -24,9 +24,7 @@ const targets = abi.supportedTargets.filter((item) => {
 })
 
 const nodeVersions = targets.filter((item) => item.runtime === 'node').map((item) => item.target)
-const electronVersions = targets
-  .filter((item) => item.runtime === 'electron')
-  .map((item) => item.target)
+const electronVersions = targets.filter((item) => item.runtime === 'electron').map((item) => item.target)
 
 const nodeCmd = `pnpm prebuild -r node ${nodeVersions.map((v) => `-t ${v}`).join(' ')}`
 const electronCmd = `pnpm prebuild -r electron ${electronVersions.map((v) => `-t ${v}`).join(' ')}`
