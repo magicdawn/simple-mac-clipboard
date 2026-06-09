@@ -2,8 +2,6 @@ import { createRequire } from 'node:module'
 import { join } from 'node:path'
 import bindings from 'bindings'
 
-const require = createRequire(__filename)
-
 export type Addon = {
   path?: string // why this ?
   clearContents: () => void
@@ -13,12 +11,17 @@ export type Addon = {
   setDataAll: (format: string, datas: Buffer[]) => boolean
 }
 
-function tryFile(file: string) {
+const require = createRequire(import.meta.dirname)
+
+function tryAddon() {
   try {
-    return { path: join(__dirname, file), ...require(file) }
+    return {
+      path: join(import.meta.dirname, '../simple_mac_clipboard.node'),
+      ...require('../simple_mac_clipboard.node'),
+    }
   } catch {
     return
   }
 }
 
-export const addon: Addon = tryFile('../simple_mac_clipboard.node') || bindings('simple_mac_clipboard')
+export const addon: Addon = tryAddon() || bindings('simple_mac_clipboard')
