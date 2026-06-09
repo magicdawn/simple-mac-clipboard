@@ -2,30 +2,7 @@ import { createRequire } from 'node:module'
 import { join } from 'node:path'
 import bindings from 'bindings'
 
-const _require = createRequire(__filename)
-
-function tryFile(file: string) {
-  return { path: join(__dirname, file), ..._require(file) }
-}
-
-const tryRelease = () => {
-  try {
-    // prevent webpack error
-    const type = 'Release'
-    return tryFile(`../build/${type}/simple_mac_clipboard.node`)
-  } catch {
-    //  noop
-  }
-}
-const tryDebug = () => {
-  try {
-    // prevent webpack error
-    const type = 'Debug'
-    return tryFile(`../build/${type}/simple_mac_clipboard.node`)
-  } catch {
-    //  noop
-  }
-}
+const require = createRequire(__filename)
 
 export type Addon = {
   path?: string // why this ?
@@ -36,4 +13,12 @@ export type Addon = {
   setDataAll: (format: string, datas: Buffer[]) => boolean
 }
 
-export const addon: Addon = tryRelease() || tryDebug() || bindings('simple_mac_clipboard')
+function tryFile(file: string) {
+  try {
+    return { path: join(__dirname, file), ...require(file) }
+  } catch {
+    return
+  }
+}
+
+export const addon: Addon = tryFile('../simple_mac_clipboard.node') || bindings('simple_mac_clipboard')

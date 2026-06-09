@@ -7,32 +7,24 @@ node_modules
 coverage
 coverage.*
 
-# .vscode/
+# cache
+.cache
+.turbo
+
 
 #
 # addon
 #
-
 # node-gyp
 /build/
+*.node
 
 # prebuild
 /prebuilds
 .prebuildrc
 
-# clangd cache
-/.cache
-
 # bear -- node-gyp rebuild
 compile_commands.json
 
-# electron-rebuild
-bin/
-
-# test
 demo/
-
-# tsup build
 dist/
-
-.turbo

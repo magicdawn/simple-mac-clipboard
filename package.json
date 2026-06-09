@@ -47,15 +47,14 @@
   "scripts": {
     "dev": "tsdown --watch",
     "dev:generate-compile_commands": "bear -- node-gyp rebuild",
-    "install": "prebuild-install -r napi || npm run build:addon",
     "build:addon": "node-gyp rebuild",
+    "build:fat-addon": "tsx ./scripts/build-universal-addon.ts",
     "build:tsdown": "tsdown",
     "build": "conc npm:build:*",
     "test": "vitest --run --fileParallelism=false",
-    "prepublishOnly": "pnpm build && pnpm test",
+    "prepublishOnly": "pnpm build:fat-addon && pnpm build:tsdown && pnpm test",
     "test-with-debug": "pnpm build:addon --debug && pnpm test",
-    "test-cover": "pnpm test -- --coverage",
-    "report-cover": "codecov"
+    "test-cover": "pnpm test -- --coverage"
   },
   "dependencies": {
     "bindings": "^1.5.0",
@@ -81,6 +80,7 @@
     "semver": "^7.8.2",
     "tsd": "^0.33.0",
     "tsdown": "^0.22.2",
+    "tsx": "^4.22.4",
     "turbo": "^2.9.16",
     "typescript": "^6.0.3",
     "vitest": "^4.1.8"
