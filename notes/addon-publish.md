@@ -4,6 +4,11 @@
 {
   "scripts": {
     "install": "prebuild-install -r napi || npm run build:addon"
+  },
+  "binary": {
+    "host": "https://cdn.jsdelivr.net/gh/magicdawn/prebuild-binary@master",
+    "remote_path": "files/{name}/v{version}",
+    "napi_versions": [3]
   }
 }
 ```
