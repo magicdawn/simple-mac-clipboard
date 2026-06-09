@@ -11,7 +11,7 @@ export type Addon = {
   setDataAll: (format: string, datas: Buffer[]) => boolean
 }
 
-const require = createRequire(import.meta.dirname)
+const require = createRequire(import.meta.filename)
 
 function tryAddon() {
   try {
