@@ -51,9 +51,9 @@
     "build:addon": "node-gyp rebuild",
     "build:fat-addon": "tsx ./scripts/build-universal-addon.ts",
     "build:tsdown": "tsdown",
-    "build": "conc npm:build:*",
+    "build": "conc pnpm:build:addon pnpm:build:tsdown",
     "test": "vitest --run --fileParallelism=false",
-    "prepublishOnly": "pnpm build:fat-addon && pnpm build:tsdown && pnpm test",
+    "prepublishOnly": "conc pnpm:build:fat-addon pnpm:build:tsdown && pnpm test",
     "test-with-debug": "pnpm build:addon --debug && pnpm test",
     "test-cover": "pnpm test -- --coverage"
   },
