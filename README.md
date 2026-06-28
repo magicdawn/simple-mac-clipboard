@@ -59,6 +59,10 @@ export function writeText(format: string, text: string): boolean
 // items
 export function writeBuffers(format: string, data: Buffer[]): boolean
 export function writeTexts(format: string, text: string[]): boolean
+
+// write PasteboardItems
+export type PasteboardItem = Record<string, Buffer | string>
+export function writePasteboardItems(...items: PasteboardItem[]): boolean
 ```
 
 ### predefined `Formats`

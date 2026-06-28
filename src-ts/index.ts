@@ -36,15 +36,16 @@ export const clip = {
   addonPath,
   clear,
 
-  writeBuffer,
-  writeBuffers,
   readBuffer,
   readBuffers,
-
-  writeText,
-  writeTexts,
   readText,
   readTexts,
+
+  writeBuffer,
+  writeBuffers,
+  writeText,
+  writeTexts,
+  writePasteboardItems,
 
   ClipboardFormat,
   FORMAT_PLAIN_TEXT,
@@ -52,4 +53,3 @@ export const clip = {
   FORMAT_SOURCE_APP_BUNDLE_ID,
 }
 export default clip
-// SyntaxError: The requested module 'simple-mac-clipboard' does not provide an export named 'default'
