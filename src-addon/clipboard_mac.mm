@@ -2,6 +2,7 @@
 #include <iostream>
 #include <napi.h>
 #include <sstream>
+#include <stddef.h>
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -84,81 +85,8 @@ Napi::Value clearContents(const CallbackInfo& info) {
   return info.Env().Undefined();
 }
 
-Napi::Value setData(const CallbackInfo& info) {
-  @autoreleasepool {
-    _validateArgs(info, {"string", "Buffer"});
-    Env env = info.Env();
-
-    // arg1: format
-    NSString *format = _getNSStringAt(info, 0);
-
-    // arg2: buf
-    Buffer b = info[1].As<Buffer>();
-    uint8_t *buf = b.Data();
-    size_t length = b.Length();
-
-    // no copy
-    // this will cause electron app to freeze, don't know why
-    // NSData *data = [NSData dataWithBytesNoCopy:buf
-    //                                     length:(NSUInteger)length
-    //                               freeWhenDone:NO];
-
-    // copy
-    NSData *data = [NSData dataWithBytes:buf length:(NSUInteger)length];
-#ifdef DEBUG
-    NSLog(@"setData: format=%@, buf.length=%zu", format, length);
-#endif
-
-    // format
-    [NSPasteboard.generalPasteboard declareTypes:@[ format ] owner:nil];
-
-    // setData
-    bool success = [NSPasteboard.generalPasteboard setData:data forType:format];
-#ifdef DEBUG
-    NSLog(@"writeToClipboard: result = %i", success);
-#endif
-
-    return Napi::Boolean::New(env, success);
-  }
-}
-
-Napi::Value setDataAll(const CallbackInfo& info) {
-  @autoreleasepool {
-    _validateArgs(info, {"string", "Array<Buffer>"});
-    Env env = info.Env();
-
-    // arg1: format
-    NSString *format = _getNSStringAt(info, 0);
-
-    // arg2: buffers
-    Napi::Array arr = info[1].As<Napi::Array>();
-    NSMutableArray<NSPasteboardItem *> *items = [NSMutableArray arrayWithCapacity:arr.Length()];
-    for (uint32_t i = 0; i < arr.Length(); i++) {
-      Napi::Value val = arr.Get(i);
-      Buffer buf = val.As<Buffer>();
-      uint8_t *bufData = buf.Data();
-      size_t length = buf.Length();
-      NSData *data = [NSData dataWithBytes:bufData length:(NSUInteger)length];
-
-      NSPasteboardItem *item = [[NSPasteboardItem alloc] init];
-      [item setData:data forType:format];
-      [items addObject:item];
-    }
-#ifdef DEBUG
-    NSLog(@"setDataAll: format=%@, items.length=%lu", format, (unsigned long)items.count);
-#endif
-
-    [NSPasteboard.generalPasteboard clearContents];
-    bool success = [NSPasteboard.generalPasteboard writeObjects:items];
-#ifdef DEBUG
-    NSLog(@"writeToClipboard: result = %i", success);
-#endif
-
-    return Napi::Boolean::New(env, success);
-  }
-}
-
-Value dataForType(const CallbackInfo& info) {
+// read
+Value readBuffer(const CallbackInfo& info) {
   @autoreleasepool {
     _validateArgs(info, {"string"});
     Env env = info.Env();
@@ -169,8 +97,7 @@ Value dataForType(const CallbackInfo& info) {
     return buf;
   }
 }
-
-Value allDataForType(const CallbackInfo& info) {
+Value readBuffers(const CallbackInfo& info) {
   @autoreleasepool {
     _validateArgs(info, {"string"});
     Env env = info.Env();
@@ -197,6 +124,135 @@ Value allDataForType(const CallbackInfo& info) {
     return result;
   }
 }
+
+// write
+Napi::Value writeBuffer(const CallbackInfo& info) {
+  @autoreleasepool {
+    _validateArgs(info, {"string", "Buffer"});
+    Env env = info.Env();
+
+    // arg1: format
+    NSString *format = _getNSStringAt(info, 0);
+
+    // arg2: buf
+    Buffer b = info[1].As<Buffer>();
+    uint8_t *buf = b.Data();
+    size_t length = b.Length();
+
+    // no copy
+    // this will cause electron app to freeze, don't know why
+    // NSData *data = [NSData dataWithBytesNoCopy:buf
+    //                                     length:(NSUInteger)length
+    //                               freeWhenDone:NO];
+
+    // copy
+    NSData *data = [NSData dataWithBytes:buf length:(NSUInteger)length];
+#ifdef DEBUG
+    NSLog(@"writeBuffer: format=%@, buf.length=%zu", format, length);
+#endif
+
+    // format
+    [NSPasteboard.generalPasteboard declareTypes:@[ format ] owner:nil];
+
+    // writeBuffer
+    bool success = [NSPasteboard.generalPasteboard setData:data forType:format];
+#ifdef DEBUG
+    NSLog(@"NSPasteboard.generalPasteboard.setData: result = %i", success);
+#endif
+
+    return Napi::Boolean::New(env, success);
+  }
+}
+Napi::Value writeBuffers(const CallbackInfo& info) {
+  @autoreleasepool {
+    _validateArgs(info, {"string", "Array<Buffer>"});
+    Env env = info.Env();
+
+    // arg1: format
+    NSString *format = _getNSStringAt(info, 0);
+
+    // arg2: buffers
+    Napi::Array arr = info[1].As<Napi::Array>();
+    NSMutableArray<NSPasteboardItem *> *items = [NSMutableArray arrayWithCapacity:arr.Length()];
+    for (uint32_t i = 0; i < arr.Length(); i++) {
+      Napi::Value val = arr.Get(i);
+      Buffer buf = val.As<Buffer>();
+      uint8_t *bufData = buf.Data();
+      size_t length = buf.Length();
+      NSData *data = [NSData dataWithBytes:bufData length:(NSUInteger)length];
+
+      NSPasteboardItem *item = [[NSPasteboardItem alloc] init];
+      [item setData:data forType:format];
+      [items addObject:item];
+    }
+
+    [NSPasteboard.generalPasteboard clearContents];
+    bool success = [NSPasteboard.generalPasteboard writeObjects:items];
+#ifdef DEBUG
+    NSLog(@"NSPasteboard.generalPasteboard.setData: result = %i", success);
+#endif
+
+    return Napi::Boolean::New(env, success);
+  }
+}
+Napi::Value writePasteboardItems(const CallbackInfo& info) {
+  @autoreleasepool {
+    size_t itemsLength = info.Length();
+
+    // validate args
+    for (size_t i = 0; i < itemsLength; i++) {
+      Napi::Value val = info[i];
+      if (!val.IsObject()) {
+        std::stringstream ss;
+        ss << "arguments type mismatch, arguments[" << i << "] must be an Object";
+        throw Napi::Error::New(info.Env(), ss.str());
+      }
+    }
+
+    Env env = info.Env();
+    NSMutableArray<NSPasteboardItem *> *items = [NSMutableArray arrayWithCapacity:itemsLength];
+
+    for (size_t i = 0; i < itemsLength; i++) {
+      Napi::Object obj = info[i].As<Napi::Object>();
+      NSPasteboardItem *item = [[NSPasteboardItem alloc] init];
+
+      for (const auto& e : obj) {
+        auto format = [NSString stringWithUTF8String:e.first.ToString().Utf8Value().c_str()];
+
+        auto val = e.second.AsValue();
+        NSData *data;
+        if (val.IsBuffer()) {
+          Buffer buf = val.As<Buffer>();
+          uint8_t *bufData = buf.Data();
+          size_t length = buf.Length();
+          data = [NSData dataWithBytes:bufData length:(NSUInteger)length];
+        } else if (val.IsString()) {
+          NSString *str = [NSString stringWithUTF8String:val.ToString().Utf8Value().c_str()];
+          data = [str dataUsingEncoding:NSUTF8StringEncoding];
+        } else {
+          std::stringstream ss;
+          ss << "arguments type mismatch, arguments[" << i << "]." << e.first.ToString().Utf8Value()
+             << " must be Buffer | string";
+          throw Napi::Error::New(info.Env(), ss.str());
+        }
+
+#if DEBUG
+        NSLog(@"NSPasteboardItem[%zu].setData: format=%@, data.length=%zu", i, format, data.length);
+#endif
+        [item setData:data forType:format];
+      }
+
+      [items addObject:item];
+    }
+
+    [NSPasteboard.generalPasteboard clearContents];
+    bool success = [NSPasteboard.generalPasteboard writeObjects:items];
+#ifdef DEBUG
+    NSLog(@"NSPasteboard.generalPasteboard.writeObjects(%zu): result = %i", items.count, success);
+#endif
+    return Napi::Boolean::New(env, success);
+  }
+}
 #endif
 
 Object Init(Env env, Object exports) {
@@ -206,12 +262,13 @@ Object Init(Env env, Object exports) {
   exports.Set(String::New(env, "clearContents"), Function::New(env, clearContents));
 
   // read
-  exports.Set(String::New(env, "dataForType"), Function::New(env, dataForType));
-  exports.Set(String::New(env, "allDataForType"), Function::New(env, allDataForType)); // array
+  exports.Set(String::New(env, "readBuffer"), Function::New(env, readBuffer));
+  exports.Set(String::New(env, "readBuffers"), Function::New(env, readBuffers)); // array
 
   // write
-  exports.Set(String::New(env, "setData"), Function::New(env, setData));
-  exports.Set(String::New(env, "setDataAll"), Function::New(env, setDataAll)); // array
+  exports.Set(String::New(env, "writeBuffer"), Function::New(env, writeBuffer));
+  exports.Set(String::New(env, "writeBuffers"), Function::New(env, writeBuffers));                 // format, buffer[]
+  exports.Set(String::New(env, "writePasteboardItems"), Function::New(env, writePasteboardItems)); // [item1, item2]
 #endif
   return exports;
 }

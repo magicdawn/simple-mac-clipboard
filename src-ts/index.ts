@@ -5,10 +5,11 @@ export const addonPath = addon.path
 
 // base functions
 export const clear = addon.clearContents
-export const writeBuffer = addon.setData
-export const writeBuffers = addon.setDataAll
-export const readBuffer = addon.dataForType
-export const readBuffers = addon.allDataForType
+export const writeBuffer = addon.writeBuffer
+export const writeBuffers = addon.writeBuffers
+export const writePasteboardItems = addon.writePasteboardItems
+export const readBuffer = addon.readBuffer
+export const readBuffers = addon.readBuffers
 
 // convenient functions
 // format is the first parameter & required
