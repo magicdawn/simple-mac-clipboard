@@ -11,7 +11,7 @@ export type Addon = {
   readBuffers: (format: string) => Buffer[]
   writeBuffer: (format: string, data: Buffer) => boolean
   writeBuffers: (format: string, datas: Buffer[]) => boolean
-  writePasteboardItems: (items: PasteboardItem[]) => void
+  writePasteboardItems: (...items: PasteboardItem[]) => void
 }
 
 const require = createRequire(import.meta.filename)

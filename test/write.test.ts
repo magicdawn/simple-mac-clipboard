@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { FORMAT_PLAIN_TEXT, readBuffer, writeBuffer, writeText } from '../dist'
+import { FORMAT_PLAIN_TEXT, readBuffer, readTexts, writeBuffer, writePasteboardItems, writeText } from '../dist'
 import { pbpasteRead } from './helpers/external-pbpaste'
 
 describe('.writeBuffer', () => {
@@ -36,5 +36,12 @@ describe('.writeText', () => {
     expect(success).toBe(true)
     // external pbpaste read
     expect(await pbpasteRead()).toBe(content)
+  })
+})
+
+describe('.writePasteboardItems', () => {
+  it('works', () => {
+    writePasteboardItems({ [FORMAT_PLAIN_TEXT]: '1' }, { [FORMAT_PLAIN_TEXT]: '2' })
+    expect(readTexts(FORMAT_PLAIN_TEXT)).toEqual(['1', '2'])
   })
 })
