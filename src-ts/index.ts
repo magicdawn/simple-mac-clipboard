@@ -3,28 +3,9 @@ import { addon } from './load-addon'
 // addon export
 export const addonPath = addon.path
 
-// base functions
 export const clear = addon.clearContents
-export const readBuffer = addon.readBuffer
-export const readBuffers = addon.readBuffers
-export const writeBuffer = addon.writeBuffer
-export const writeBuffers = addon.writeBuffers
 
-export type { PasteboardItem } from './load-addon'
-export const writePasteboardItems = addon.writePasteboardItems
-
-// convenient functions
-// format is the first parameter & required
-export const writeText = (format: string, text: string) => writeBuffer(format, Buffer.from(text))
-export const writeTexts = (format: string, texts: string[]) =>
-  writeBuffers(
-    format,
-    texts.map((t) => Buffer.from(t)),
-  )
-export const readText = (format: string) => readBuffer(format).toString('utf8')
-export const readTexts = (format: string) => readBuffers(format).map((buf) => buf.toString('utf8'))
-
-// format
+// #region format
 export enum ClipboardFormat {
   FileUrl = 'public.file-url',
   PlainText = 'public.utf8-plain-text',
@@ -33,6 +14,27 @@ export enum ClipboardFormat {
 export const FORMAT_PLAIN_TEXT = ClipboardFormat.PlainText
 export const FORMAT_FILE_URL = ClipboardFormat.FileUrl
 export const FORMAT_SOURCE_APP_BUNDLE_ID = ClipboardFormat.SourceAppBundleId
+// #endregion
+
+// #region read
+export const readBuffer = addon.readBuffer
+export const readBuffers = addon.readBuffers
+export const readText = (format: string) => readBuffer(format).toString('utf8')
+export const readTexts = (format: string) => readBuffers(format).map((buf) => buf.toString('utf8'))
+// #endregion
+
+// #region write
+export type { PasteboardItem } from './load-addon'
+
+export const writePasteboardItems = addon.writePasteboardItems
+
+export function writeFormat(format: string, ...datas: Array<Buffer | string | Buffer[] | string[]>): boolean {
+  if (!format) throw new Error('format is required')
+  const _datas = datas.flat()
+  if (!_datas.length) return false
+  return writePasteboardItems(..._datas.map((d) => ({ [format]: d })))
+}
+// #endregion
 
 export const clip = {
   addonPath,
@@ -43,11 +45,8 @@ export const clip = {
   readText,
   readTexts,
 
-  writeBuffer,
-  writeBuffers,
-  writeText,
-  writeTexts,
   writePasteboardItems,
+  writeFormat,
 
   ClipboardFormat,
   FORMAT_PLAIN_TEXT,

@@ -51,18 +51,34 @@ export function readTexts(format: string): string[]
 
 ### `write`
 
+#### `writeFormat`
+
 ```ts
-// single item
-export function writeBuffer(format: string, data: Buffer): boolean
-export function writeText(format: string, text: string): boolean
+// typedef
+export function writeFormat(format: string, ...datas: Array<Buffer | string | Buffer[] | string[]>): boolean
+```
 
-// items
-export function writeBuffers(format: string, data: Buffer[]): boolean
-export function writeTexts(format: string, text: string[]): boolean
+```ts
+// example
+import clip from 'simple-mac-clipboard'
+clip.writeFormat(clip.FORMAT_PLAIN_TEXT, 'text1', Buffer.from('text2'), [Buffer.from('text3'), 'text4'])
+```
 
-// write PasteboardItems
+#### `writePasteboardItems`
+
+```ts
+// typedef
 export type PasteboardItem = Record<string, Buffer | string>
 export function writePasteboardItems(...items: PasteboardItem[]): boolean
+```
+
+```ts
+// example
+import clip from 'simple-mac-clipboard'
+clip.writePasteboardItems(
+  { 'item1-format1': 'text1' },
+  { 'item2-format1': Buffer.from('text2'), 'item2-format2': 'text2', [clip.FORMAT_PLAIN_TEXT]: 'text3'] },
+)
 ```
 
 ### predefined `Formats`
@@ -72,16 +88,13 @@ export function writePasteboardItems(...items: PasteboardItem[]): boolean
 ## read/write File Paths
 
 ```ts
-import { FORMAT_FILE_URL, readTexts, writeTexts } from 'simple-mac-clipboard'
+import { FORMAT_FILE_URL, readTexts, writeFormat } from 'simple-mac-clipboard'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const filePaths = ['/tmp/a/b.txt', '/tmp/c']
 
 // write
-writeTexts(
-  FORMAT_FILE_URL,
-  filePaths.map((p) => pathToFileURL(p).href),
-)
+writeFormat(FORMAT_FILE_URL, ...filePaths.map((p) => pathToFileURL(p).href))
 
 // read
 console.log(readTexts(FORMAT_FILE_URL).map((u) => fileURLToPath(u)))

@@ -139,63 +139,12 @@ Value readBuffers(const CallbackInfo& info) {
 }
 
 // write
-Napi::Value writeBuffer(const CallbackInfo& info) {
-  @autoreleasepool {
-    _validateArgs(info, {"string", "Buffer"});
-    Env env = info.Env();
-    NSString* format = _getNSStringAt(info, 0);
-    NSData* data = _createNsDataFromNapiValue(info[1]);
-#ifdef DEBUG
-    NSLog(@"writeBuffer: format=%@, buf.length=%zu", format, length);
-#endif
-
-    // format
-    [NSPasteboard.generalPasteboard declareTypes:@[ format ] owner:nil];
-
-    // writeBuffer
-    bool success = [NSPasteboard.generalPasteboard setData:data forType:format];
-#ifdef DEBUG
-    NSLog(@"NSPasteboard.generalPasteboard.setData: result = %i", success);
-#endif
-
-    return Napi::Boolean::New(env, success);
-  }
-}
-Napi::Value writeBuffers(const CallbackInfo& info) {
-  @autoreleasepool {
-    _validateArgs(info, {"string", "Array<Buffer>"});
-    Env env = info.Env();
-
-    // arg1: format
-    NSString* format = _getNSStringAt(info, 0);
-
-    // arg2: buffers
-    Napi::Array arr = info[1].As<Napi::Array>();
-    NSMutableArray<NSPasteboardItem*>* items = [NSMutableArray arrayWithCapacity:arr.Length()];
-    for (uint32_t i = 0; i < arr.Length(); i++) {
-      Napi::Value val = arr.Get(i);
-      Buffer buf = val.As<Buffer>();
-      uint8_t* bufData = buf.Data();
-      size_t length = buf.Length();
-      NSData* data = [NSData dataWithBytes:bufData length:(NSUInteger)length];
-
-      NSPasteboardItem* item = [[NSPasteboardItem alloc] init];
-      [item setData:data forType:format];
-      [items addObject:item];
-    }
-
-    [NSPasteboard.generalPasteboard clearContents];
-    bool success = [NSPasteboard.generalPasteboard writeObjects:items];
-#ifdef DEBUG
-    NSLog(@"NSPasteboard.generalPasteboard.setData: result = %i", success);
-#endif
-
-    return Napi::Boolean::New(env, success);
-  }
-}
 Napi::Value writePasteboardItems(const CallbackInfo& info) {
   @autoreleasepool {
     size_t itemsLength = info.Length();
+    if (itemsLength == 0) {
+      return Napi::Boolean::New(info.Env(), false);
+    }
 
     // validate args
     for (size_t i = 0; i < itemsLength; i++) {
@@ -223,9 +172,9 @@ Napi::Value writePasteboardItems(const CallbackInfo& info) {
       NSPasteboardItem* item = [[NSPasteboardItem alloc] init];
 
       for (const auto& e : obj) {
-        auto format = [NSString stringWithUTF8String:e.first.ToString().Utf8Value().c_str()];
+        NSString* format = [NSString stringWithUTF8String:e.first.ToString().Utf8Value().c_str()];
 
-        auto val = e.second.AsValue();
+        Napi::Value val = e.second.AsValue();
         NSData* data;
         if (val.IsBuffer()) {
           Buffer buf = val.As<Buffer>();
@@ -272,8 +221,6 @@ Object Init(Env env, Object exports) {
   exports.Set(String::New(env, "readBuffers"), Function::New(env, readBuffers)); // array
 
   // write
-  exports.Set(String::New(env, "writeBuffer"), Function::New(env, writeBuffer));
-  exports.Set(String::New(env, "writeBuffers"), Function::New(env, writeBuffers));                 // format, buffer[]
   exports.Set(String::New(env, "writePasteboardItems"), Function::New(env, writePasteboardItems)); // [item1, item2]
 #endif
   return exports;

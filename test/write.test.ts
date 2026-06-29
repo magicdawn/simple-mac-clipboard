@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { FORMAT_PLAIN_TEXT, readBuffer, readTexts, writeBuffer, writePasteboardItems, writeText } from '../dist'
+import { FORMAT_PLAIN_TEXT, readBuffer, readTexts, writeFormat, writePasteboardItems } from '../dist'
 import { pbpasteRead } from './helpers/external-pbpaste'
 
-describe('.writeBuffer', () => {
+describe('.writeFormat(Buffer)', () => {
   it('it works', async () => {
     // addon write
     const content = '哈哈nihao'
     const format = 'public.utf8-plain-text'
-    const success = writeBuffer(format, Buffer.from(content))
+    const success = writeFormat(format, Buffer.from(content))
     expect(success).toBe(true)
 
     // addon read
@@ -21,18 +21,15 @@ describe('.writeBuffer', () => {
   })
 
   it('when arguments error', async () => {
-    expect(writeBuffer).to.throw(/arguments count mismatch/)
-    expect(writeBuffer.bind(null, 1 as any)).to.throw(/arguments count mismatch/)
-    expect(writeBuffer.bind(null, 1 as any, 1 as any)).to.throw(/arguments type mismatch/)
-    expect(writeBuffer.bind(null, FORMAT_PLAIN_TEXT, 1 as any)).to.throw(/arguments type mismatch/)
+    expect(writeFormat).to.throw(/format is required/)
   })
 })
 
-describe('.writeText', () => {
+describe('.writeFormat(string)', () => {
   it('it works ', async () => {
     const content = __filename + '哈哈'
     // addon write
-    const success = writeText(FORMAT_PLAIN_TEXT, content)
+    const success = writeFormat(FORMAT_PLAIN_TEXT, content)
     expect(success).toBe(true)
     // external pbpaste read
     expect(await pbpasteRead()).toBe(content)

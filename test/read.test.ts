@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { clear, FORMAT_PLAIN_TEXT, readBuffer, readText, readTexts, writeTexts } from '../dist'
+import { clear, FORMAT_PLAIN_TEXT, readBuffer, readText, readTexts } from '../dist'
+import { writeFormat } from '../src-ts'
 import { pbcopy } from './helpers/external-pbcopy'
 import { pbpasteRead } from './helpers/external-pbpaste'
 
@@ -41,7 +42,7 @@ describe('.readText', () => {
 
 describe('.readTexts works', () => {
   it('it works ', () => {
-    writeTexts(FORMAT_PLAIN_TEXT, ['First string', 'Second string'])
+    writeFormat(FORMAT_PLAIN_TEXT, ['First string', 'Second string'])
     expect(readTexts(FORMAT_PLAIN_TEXT)).toEqual(['First string', 'Second string'])
   })
 })
