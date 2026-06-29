@@ -69,7 +69,7 @@ clip.writeFormat(clip.FORMAT_PLAIN_TEXT, 'text1', Buffer.from('text2'), [Buffer.
 ```ts
 // typedef
 export type PasteboardItem = Record<string, Buffer | string>
-export function writePasteboardItems(...items: PasteboardItem[]): boolean
+export function writePasteboardItems(...items: Array<PasteboardItem | PasteboardItem[]>): boolean
 ```
 
 ```ts
@@ -77,8 +77,12 @@ export function writePasteboardItems(...items: PasteboardItem[]): boolean
 import clip from 'simple-mac-clipboard'
 clip.writePasteboardItems(
   { 'item1-format1': 'text1' },
-  { 'item2-format1': Buffer.from('text2'), 'item2-format2': 'text2', [clip.FORMAT_PLAIN_TEXT]: 'text3'] },
+  { 'item2-format1': Buffer.from('text2'), 'item2-format2': 'text2', [clip.FORMAT_PLAIN_TEXT]: 'text3' },
 )
+clip.writePasteboardItems([
+  { 'item1-format1': 'text1' },
+  { 'item2-format1': Buffer.from('text2'), 'item2-format2': 'text2', [clip.FORMAT_PLAIN_TEXT]: 'text3' },
+])
 ```
 
 ### predefined `Formats`

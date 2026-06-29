@@ -139,7 +139,7 @@ Value readBuffers(const CallbackInfo& info) {
 }
 
 // write
-Napi::Value writePasteboardItems(const CallbackInfo& info) {
+Napi::Value writeVariadicPasteboardItems(const CallbackInfo& info) {
   @autoreleasepool {
     size_t itemsLength = info.Length();
     if (itemsLength == 0) {
@@ -221,7 +221,8 @@ Object Init(Env env, Object exports) {
   exports.Set(String::New(env, "readBuffers"), Function::New(env, readBuffers)); // array
 
   // write
-  exports.Set(String::New(env, "writePasteboardItems"), Function::New(env, writePasteboardItems)); // [item1, item2]
+  exports.Set(String::New(env, "writeVariadicPasteboardItems"),
+              Function::New(env, writeVariadicPasteboardItems)); // [item1, item2]
 #endif
   return exports;
 }

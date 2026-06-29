@@ -1,4 +1,4 @@
-import { addon } from './load-addon'
+import { addon, type PasteboardItem } from './addon'
 
 // addon export
 export const addonPath = addon.path
@@ -24,14 +24,16 @@ export const readTexts = (format: string) => readBuffers(format).map((buf) => bu
 // #endregion
 
 // #region write
-export type { PasteboardItem } from './load-addon'
+export type { PasteboardItem } from './addon'
 
-export const writePasteboardItems = addon.writePasteboardItems
+export function writePasteboardItems(...items: Array<PasteboardItem | PasteboardItem[]>): boolean {
+  const _items = items.flat()
+  return addon.writeVariadicPasteboardItems(..._items)
+}
 
 export function writeFormat(format: string, ...datas: Array<Buffer | string | Buffer[] | string[]>): boolean {
   if (!format) throw new Error('format is required')
   const _datas = datas.flat()
-  if (!_datas.length) return false
   return writePasteboardItems(..._datas.map((d) => ({ [format]: d })))
 }
 // #endregion
