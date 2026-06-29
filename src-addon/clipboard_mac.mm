@@ -203,6 +203,12 @@ Napi::Value writePasteboardItems(const CallbackInfo& info) {
       if (!val.IsObject()) {
         // throw Napi::Error::New(info.Env(), std::format("arguments type mismatch, arguments[{}] must be an Object",
         // i));
+        //
+        // throw Napi::Error::New(
+        //     info.Env(),
+        //     [[NSString stringWithFormat:@"arguments type mismatch, arguments[%zu] must be an Object", i]
+        //     UTF8String]);
+        //
         std::stringstream ss;
         ss << "arguments type mismatch, arguments[" << i << "] must be an Object";
         throw Napi::Error::New(info.Env(), ss.str());

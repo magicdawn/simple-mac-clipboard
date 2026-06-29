@@ -8,3 +8,7 @@ c++ -O3 -gdwarf-2 -fno-strict-aliasing -fvisibility=hidden -mmacosx-version-min=
   c++ -bundle -undefined dynamic_lookup -Wl,-search_paths_first -mmacosx-version-min=10.7 -arch arm64 -L./Release -stdlib=libc++  -o Release/simple_mac_clipboard.node Release/obj.target/simple_mac_clipboard/src-addon/clipboard_mac.o -framework Foundation -framework AppKit
 ld: warning: object file (/Users/magicdawn/workspace/oss-projects/simple-mac-clipboard/build/Release/obj.target/simple_mac_clipboard/src-addon/clipboard_mac.o) was built for newer 'macOS' version (13.3) than being linked (11.0)
 ```
+
+```objc
+std::string nsName = [[NSString stringWithFormat:@"Hello, %s", cppName.c_str()] UTF8String];
+```
