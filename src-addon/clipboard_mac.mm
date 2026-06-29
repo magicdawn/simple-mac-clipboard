@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <format>
 #include <iostream>
 #include <napi.h>
 #include <sstream>
@@ -25,7 +26,7 @@ using Napi::Value;
 using Buffer = Napi::Buffer<uint8_t>;
 
 #ifdef __APPLE__
-NSString *_getNSStringAt(const CallbackInfo& info, size_t index) {
+NSString* _getNSStringAt(const CallbackInfo& info, size_t index) {
   std::string s = info[index].ToString().Utf8Value();
   return [NSString stringWithUTF8String:s.c_str()];
 }
@@ -69,8 +70,22 @@ void _validateArgs(const CallbackInfo& info, std::vector<std::string> expected) 
   }
 }
 
-Buffer _copyNSDataToBuffer(const Env& env, NSData *data) {
-  uint8_t *pData = (uint8_t *)data.bytes;
+// helpers
+NSData* _createNsDataFromNapiValue(const Napi::Value& val) {
+  NSData* data = nil;
+  if (val.IsBuffer()) {
+    Buffer buf = val.As<Buffer>();
+    uint8_t* bufData = buf.Data();
+    size_t length = buf.Length();
+    data = [NSData dataWithBytes:bufData length:(NSUInteger)length];
+  } else if (val.IsString()) {
+    NSString* str = [NSString stringWithUTF8String:val.ToString().Utf8Value().c_str()];
+    data = [str dataUsingEncoding:NSUTF8StringEncoding];
+  }
+  return data;
+}
+Buffer _createNapiBufferFromNsData(const Env& env, NSData* data) {
+  uint8_t* pData = (uint8_t*)data.bytes;
   uint32_t len = (uint32_t)data.length;
   Buffer buf = Buffer::Copy(env, pData, len);
   return buf;
@@ -90,10 +105,9 @@ Value readBuffer(const CallbackInfo& info) {
   @autoreleasepool {
     _validateArgs(info, {"string"});
     Env env = info.Env();
-
-    NSString *dataType = _getNSStringAt(info, 0);
-    NSData *data = [NSPasteboard.generalPasteboard dataForType:dataType];
-    auto buf = _copyNSDataToBuffer(env, data);
+    NSString* dataType = _getNSStringAt(info, 0);
+    NSData* data = [NSPasteboard.generalPasteboard dataForType:dataType];
+    auto buf = _createNapiBufferFromNsData(env, data);
     return buf;
   }
 }
@@ -101,16 +115,15 @@ Value readBuffers(const CallbackInfo& info) {
   @autoreleasepool {
     _validateArgs(info, {"string"});
     Env env = info.Env();
-
-    NSString *dataType = _getNSStringAt(info, 0);
+    NSString* dataType = _getNSStringAt(info, 0);
 
     std::vector<Buffer> buffers;
-    NSArray<NSPasteboardItem *> *items = [NSPasteboard.generalPasteboard pasteboardItems];
-    for (NSPasteboardItem *item in items) {
+    NSArray<NSPasteboardItem*>* items = [NSPasteboard.generalPasteboard pasteboardItems];
+    for (NSPasteboardItem* item in items) {
       // Get data for the specified type
-      NSData *data = [item dataForType:dataType];
+      NSData* data = [item dataForType:dataType];
       if (data) {
-        auto buf = _copyNSDataToBuffer(env, data);
+        auto buf = _createNapiBufferFromNsData(env, data);
         buffers.push_back(buf);
       }
     }
@@ -130,23 +143,8 @@ Napi::Value writeBuffer(const CallbackInfo& info) {
   @autoreleasepool {
     _validateArgs(info, {"string", "Buffer"});
     Env env = info.Env();
-
-    // arg1: format
-    NSString *format = _getNSStringAt(info, 0);
-
-    // arg2: buf
-    Buffer b = info[1].As<Buffer>();
-    uint8_t *buf = b.Data();
-    size_t length = b.Length();
-
-    // no copy
-    // this will cause electron app to freeze, don't know why
-    // NSData *data = [NSData dataWithBytesNoCopy:buf
-    //                                     length:(NSUInteger)length
-    //                               freeWhenDone:NO];
-
-    // copy
-    NSData *data = [NSData dataWithBytes:buf length:(NSUInteger)length];
+    NSString* format = _getNSStringAt(info, 0);
+    NSData* data = _createNsDataFromNapiValue(info[1]);
 #ifdef DEBUG
     NSLog(@"writeBuffer: format=%@, buf.length=%zu", format, length);
 #endif
@@ -169,19 +167,19 @@ Napi::Value writeBuffers(const CallbackInfo& info) {
     Env env = info.Env();
 
     // arg1: format
-    NSString *format = _getNSStringAt(info, 0);
+    NSString* format = _getNSStringAt(info, 0);
 
     // arg2: buffers
     Napi::Array arr = info[1].As<Napi::Array>();
-    NSMutableArray<NSPasteboardItem *> *items = [NSMutableArray arrayWithCapacity:arr.Length()];
+    NSMutableArray<NSPasteboardItem*>* items = [NSMutableArray arrayWithCapacity:arr.Length()];
     for (uint32_t i = 0; i < arr.Length(); i++) {
       Napi::Value val = arr.Get(i);
       Buffer buf = val.As<Buffer>();
-      uint8_t *bufData = buf.Data();
+      uint8_t* bufData = buf.Data();
       size_t length = buf.Length();
-      NSData *data = [NSData dataWithBytes:bufData length:(NSUInteger)length];
+      NSData* data = [NSData dataWithBytes:bufData length:(NSUInteger)length];
 
-      NSPasteboardItem *item = [[NSPasteboardItem alloc] init];
+      NSPasteboardItem* item = [[NSPasteboardItem alloc] init];
       [item setData:data forType:format];
       [items addObject:item];
     }
@@ -203,6 +201,8 @@ Napi::Value writePasteboardItems(const CallbackInfo& info) {
     for (size_t i = 0; i < itemsLength; i++) {
       Napi::Value val = info[i];
       if (!val.IsObject()) {
+        // throw Napi::Error::New(info.Env(), std::format("arguments type mismatch, arguments[{}] must be an Object",
+        // i));
         std::stringstream ss;
         ss << "arguments type mismatch, arguments[" << i << "] must be an Object";
         throw Napi::Error::New(info.Env(), ss.str());
@@ -210,24 +210,24 @@ Napi::Value writePasteboardItems(const CallbackInfo& info) {
     }
 
     Env env = info.Env();
-    NSMutableArray<NSPasteboardItem *> *items = [NSMutableArray arrayWithCapacity:itemsLength];
+    NSMutableArray<NSPasteboardItem*>* items = [NSMutableArray arrayWithCapacity:itemsLength];
 
     for (size_t i = 0; i < itemsLength; i++) {
       Napi::Object obj = info[i].As<Napi::Object>();
-      NSPasteboardItem *item = [[NSPasteboardItem alloc] init];
+      NSPasteboardItem* item = [[NSPasteboardItem alloc] init];
 
       for (const auto& e : obj) {
         auto format = [NSString stringWithUTF8String:e.first.ToString().Utf8Value().c_str()];
 
         auto val = e.second.AsValue();
-        NSData *data;
+        NSData* data;
         if (val.IsBuffer()) {
           Buffer buf = val.As<Buffer>();
-          uint8_t *bufData = buf.Data();
+          uint8_t* bufData = buf.Data();
           size_t length = buf.Length();
           data = [NSData dataWithBytes:bufData length:(NSUInteger)length];
         } else if (val.IsString()) {
-          NSString *str = [NSString stringWithUTF8String:val.ToString().Utf8Value().c_str()];
+          NSString* str = [NSString stringWithUTF8String:val.ToString().Utf8Value().c_str()];
           data = [str dataUsingEncoding:NSUTF8StringEncoding];
         } else {
           std::stringstream ss;

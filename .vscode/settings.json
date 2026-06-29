@@ -2,11 +2,18 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
+  "ruff.configuration": {
+    "indent-width": 2
+  },
   "[objective-c]": {
     "editor.defaultFormatter": "xaver.clang-format"
   },
   "[objective-cpp]": {
     "editor.defaultFormatter": "xaver.clang-format",
     "editor.inlayHints.enabled": "offUnlessPressed"
+  },
+  "[python]": {
+    // for binding.gyp
+    "editor.defaultFormatter": "charliermarsh.ruff"
   }
 }
