@@ -85,6 +85,24 @@ clip.writePasteboardItems([
 ])
 ```
 
+#### `declareTypeAndSetData`
+
+> write single item with invalid UTI
+> [NSPasteboard declareTypes:owner:] 是极早期版本的 macOS API
+> 它对字符串的格式校验非常宽松，允许通过传统的非 UTI 字符串来建立剪贴板通道。
+
+```ts
+// typedef
+export function declareTypeAndSetData(format: string, data: Buffer | string): boolean
+```
+
+```ts
+// example
+import { declareTypeAndSetData, readText } from 'simple-mac-clipboard'
+declareTypeAndSetData('invalid-uti-without-dot', 'invalid-uti-without-dot-content')
+expect(readText('invalid-uti-without-dot')).toEqual('invalid-uti-without-dot-content')
+```
+
 ### predefined `Formats`
 
 `FORMAT_PLAIN_TEXT` / `FORMAT_FILE_URL` / `FORMAT_SOURCE_APP_BUNDLE_ID`
