@@ -36,6 +36,13 @@ export function writeFormat(format: string, ...datas: Array<Buffer | string | Bu
   const _datas = datas.flat()
   return writePasteboardItems(..._datas.map((d) => ({ [format]: d })))
 }
+
+/**
+ * write single item with invalid UTI
+ * [NSPasteboard declareTypes:owner:] 是极早期版本的 macOS API
+ * 它对字符串的格式校验非常宽松，允许通过传统的非 UTI 字符串来建立剪贴板通道。
+ */
+export const declareTypeAndSetData = addon.declareTypeAndSetData
 // #endregion
 
 export const clip = {
@@ -49,6 +56,7 @@ export const clip = {
 
   writePasteboardItems,
   writeFormat,
+  declareTypeAndSetData,
 
   ClipboardFormat,
   FORMAT_PLAIN_TEXT,

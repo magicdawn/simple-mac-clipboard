@@ -1,3 +1,18 @@
-ColumnLimit: 120
+ColumnLimit: 130
 PointerAlignment: Left
 ReferenceAlignment: Left
+
+# 像 Prettier 一样：换行时左括号后换行，右括号单独成行 (需要 clang-format 14+)
+AlignAfterOpenBracket: BlockIndent
+# 像 Prettier 一样：一旦换行，每个参数必须独占一行，不允许把几个短参数挤在一行
+BinPackArguments: false
+# 像 Prettier 一样：函数声明/定义时的参数也遵循上述严格的一参一行规则
+BinPackParameters: false
+# 禁止把所有参数打包一起推到下一行
+AllowAllArgumentsOnNextLine: false
+# 针对函数声明/定义也应用同样的规则（可选但推荐）
+AllowAllParametersOfDeclarationOnNextLine: false
+
+# Prettier 的默认缩进是 2 个空格 (如果你习惯 4 个，这里可以改)
+IndentWidth: 2
+ContinuationIndentWidth: 2

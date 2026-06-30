@@ -2,12 +2,15 @@
   "targets": [
     {
       "target_name": "simple_mac_clipboard",
-      "defines": ["NAPI_VERSION=3"],
+      "defines": ["NAPI_VERSION=3", "FMT_HEADER_ONLY"],
       "dependencies": [
         "<!(node -p \"require('node-addon-api').targets\"):node_addon_api_except"
       ],
       "sources": ["src-addon/clipboard_mac.mm"],
-      "include_dirs": ["<!@(node -p \"require('node-addon-api').include\")"],
+      "include_dirs": [
+        "<!@(node -p \"require('node-addon-api').include\")",
+        "./addon-deps/fmt-12.2.0/include",
+      ],
       "cflags_cc": ["-std=c++20", "-fvisibility=hidden"],
       "xcode_settings": {
         "GCC_ENABLE_CPP_EXCEPTIONS": "YES",

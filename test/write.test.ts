@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { FORMAT_PLAIN_TEXT, readBuffer, readTexts, writeFormat, writePasteboardItems } from '../dist'
+import {
+  declareTypeAndSetData,
+  FORMAT_PLAIN_TEXT,
+  readBuffer,
+  readText,
+  readTexts,
+  writeFormat,
+  writePasteboardItems,
+} from '../dist'
 import { pbpasteRead } from './helpers/external-pbpaste'
 
 describe('.writeFormat(Buffer)', () => {
@@ -40,5 +48,12 @@ describe('.writePasteboardItems', () => {
   it('works', () => {
     writePasteboardItems({ [FORMAT_PLAIN_TEXT]: '1' }, { [FORMAT_PLAIN_TEXT]: '2' })
     expect(readTexts(FORMAT_PLAIN_TEXT)).toEqual(['1', '2'])
+  })
+})
+
+describe('.declareTypeAndSetData', () => {
+  it('works', () => {
+    declareTypeAndSetData('invalid-uti-without-dot', 'invalid-uti-without-dot-content')
+    expect(readText('invalid-uti-without-dot')).toEqual('invalid-uti-without-dot-content')
   })
 })

@@ -1,8 +1,6 @@
 #include <cstddef>
-#include <format>
-#include <iostream>
+#include <fmt/format.h>
 #include <napi.h>
-#include <sstream>
 #include <stddef.h>
 #include <stdint.h>
 #include <string>
@@ -15,62 +13,60 @@
 #import <objc/objc-runtime.h>
 #endif
 
-using namespace std;
 using Napi::CallbackInfo;
-using Napi::Env;
 using Napi::Function;
-using Napi::Object;
-using Napi::String;
-using Napi::Value;
-
 using Buffer = Napi::Buffer<uint8_t>;
 
 #ifdef __APPLE__
-NSString* _getNSStringAt(const CallbackInfo& info, size_t index) {
-  std::string s = info[index].ToString().Utf8Value();
-  return [NSString stringWithUTF8String:s.c_str()];
-}
-
+// helpers
 void _validateArgs(const CallbackInfo& info, std::vector<std::string> expected) {
+  Napi::Env env = info.Env();
+
   if (info.Length() != expected.size()) {
-    // std::format("expect {} arguments, actual passed {}", info.Length(), expected.size())
-    std::stringstream ss;
-    ss << "arguments count mismatch, expect " << expected.size() << " arguments, got " << info.Length();
-    throw Napi::Error::New(info.Env(), ss.str());
+    throw Napi::Error::New(
+      env,
+      fmt::format("arguments count mismatch, expect {} arguments, got {}", info.Length(), expected.size())
+    );
   }
 
   // check type: only string or Buffer supported
   for (size_t i = 0; i < expected.size(); i++) {
-    if (expected[i] == "string" && !info[i].IsString()) {
-      std::stringstream ss;
-      ss << "arguments type mismatch, arguments[" << i << "] must be string";
-      throw Napi::Error::New(info.Env(), ss.str());
+    std::string expectedType = expected[i];
+    std::erase(expectedType, ' '); // remove space
+    Napi::Value val = info[i];
+
+    if (expectedType == "string" && !val.IsString()) {
+      throw Napi::TypeError::New(env, fmt::format("arguments type mismatch, arguments[{}] must be string", i));
     }
 
-    if (expected[i] == "Buffer" && !info[i].IsBuffer()) {
-      std::stringstream ss;
-      ss << "arguments type mismatch, arguments[" << i << "] must be Buffer";
-      throw Napi::Error::New(info.Env(), ss.str());
+    if (expectedType == "Buffer" && !val.IsBuffer()) {
+      throw Napi::TypeError::New(env, fmt::format("arguments type mismatch, arguments[{}] must be Buffer", i));
     }
 
-    if (expected[i] == "Array<Buffer>" || expected[i] == "Buffer[]") {
-      std::stringstream ss;
-      ss << "arguments type mismatch, arguments[" << i << "] must be Array<Buffer>";
-      if (!info[i].IsArray()) {
-        throw Napi::Error::New(info.Env(), ss.str());
+    if ((expectedType == "string|Buffer" || expectedType == "Buffer|string") && !val.IsBuffer() && !val.IsString()) {
+      throw Napi::TypeError::New(env, fmt::format("arguments type mismatch, arguments[{}] must be string | Buffer", i));
+    }
+
+    if (expectedType == "Array<Buffer>" || expectedType == "Buffer[]") {
+      std::string msg = fmt::format("arguments type mismatch, arguments[{}] must be Array<Buffer>", i);
+      if (!val.IsArray()) {
+        throw Napi::TypeError::New(env, msg);
       }
-      Napi::Array arr = info[1].As<Napi::Array>();
+      Napi::Array arr = val.As<Napi::Array>();
       for (uint32_t i = 0; i < arr.Length(); i++) {
         Napi::Value val = arr[i];
         if (!val.IsBuffer()) {
-          throw Napi::Error::New(info.Env(), ss.str());
+          throw Napi::TypeError::New(env, msg);
         }
       }
     }
   }
 }
 
-// helpers
+NSString* _createNsString(const Napi::Value& val) {
+  std::string s = val.ToString().Utf8Value();
+  return [NSString stringWithUTF8String:s.c_str()];
+}
 NSData* _createNsDataFromNapiValue(const Napi::Value& val) {
   NSData* data = nil;
   if (val.IsBuffer()) {
@@ -84,7 +80,7 @@ NSData* _createNsDataFromNapiValue(const Napi::Value& val) {
   }
   return data;
 }
-Buffer _createNapiBufferFromNsData(const Env& env, NSData* data) {
+Buffer _createNapiBufferFromNsData(const Napi::Env& env, NSData* data) {
   uint8_t* pData = (uint8_t*)data.bytes;
   uint32_t len = (uint32_t)data.length;
   Buffer buf = Buffer::Copy(env, pData, len);
@@ -92,30 +88,25 @@ Buffer _createNapiBufferFromNsData(const Env& env, NSData* data) {
 }
 
 Napi::Value clearContents(const CallbackInfo& info) {
-#ifdef DEBUG
-  NSLog(@"clearContents ...");
-#endif
-  // clear
-  [NSPasteboard.generalPasteboard clearContents];
-  return info.Env().Undefined();
+  @autoreleasepool {
+    [NSPasteboard.generalPasteboard clearContents];
+    return info.Env().Undefined();
+  }
 }
 
 // read
-Value readBuffer(const CallbackInfo& info) {
+Napi::Value readBuffer(const CallbackInfo& info) {
   @autoreleasepool {
     _validateArgs(info, {"string"});
-    Env env = info.Env();
-    NSString* dataType = _getNSStringAt(info, 0);
-    NSData* data = [NSPasteboard.generalPasteboard dataForType:dataType];
-    auto buf = _createNapiBufferFromNsData(env, data);
-    return buf;
+    NSString* format = _createNsString(info[0]);
+    NSData* data = [NSPasteboard.generalPasteboard dataForType:format];
+    return _createNapiBufferFromNsData(info.Env(), data);
   }
 }
-Value readBuffers(const CallbackInfo& info) {
+Napi::Value readBuffers(const CallbackInfo& info) {
   @autoreleasepool {
     _validateArgs(info, {"string"});
-    Env env = info.Env();
-    NSString* dataType = _getNSStringAt(info, 0);
+    NSString* dataType = _createNsString(info[0]);
 
     std::vector<Buffer> buffers;
     NSArray<NSPasteboardItem*>* items = [NSPasteboard.generalPasteboard pasteboardItems];
@@ -123,13 +114,13 @@ Value readBuffers(const CallbackInfo& info) {
       // Get data for the specified type
       NSData* data = [item dataForType:dataType];
       if (data) {
-        auto buf = _createNapiBufferFromNsData(env, data);
+        Buffer buf = _createNapiBufferFromNsData(info.Env(), data);
         buffers.push_back(buf);
       }
     }
 
-    // Convert vector of buffers to JavaScript array
-    auto result = Napi::Array::New(env, buffers.size());
+    // to js array
+    Napi::Array result = Napi::Array::New(info.Env(), buffers.size());
     for (size_t i = 0; i < buffers.size(); ++i) {
       result.Set(i, buffers[i]);
     }
@@ -150,21 +141,10 @@ Napi::Value writeVariadicPasteboardItems(const CallbackInfo& info) {
     for (size_t i = 0; i < itemsLength; i++) {
       Napi::Value val = info[i];
       if (!val.IsObject()) {
-        // throw Napi::Error::New(info.Env(), std::format("arguments type mismatch, arguments[{}] must be an Object",
-        // i));
-        //
-        // throw Napi::Error::New(
-        //     info.Env(),
-        //     [[NSString stringWithFormat:@"arguments type mismatch, arguments[%zu] must be an Object", i]
-        //     UTF8String]);
-        //
-        std::stringstream ss;
-        ss << "arguments type mismatch, arguments[" << i << "] must be an Object";
-        throw Napi::Error::New(info.Env(), ss.str());
+        throw Napi::TypeError::New(info.Env(), fmt::format("arguments type mismatch, arguments[{}] must be an Object", i));
       }
     }
 
-    Env env = info.Env();
     NSMutableArray<NSPasteboardItem*>* items = [NSMutableArray arrayWithCapacity:itemsLength];
 
     for (size_t i = 0; i < itemsLength; i++) {
@@ -173,22 +153,12 @@ Napi::Value writeVariadicPasteboardItems(const CallbackInfo& info) {
 
       for (const auto& e : obj) {
         NSString* format = [NSString stringWithUTF8String:e.first.ToString().Utf8Value().c_str()];
-
-        Napi::Value val = e.second.AsValue();
-        NSData* data;
-        if (val.IsBuffer()) {
-          Buffer buf = val.As<Buffer>();
-          uint8_t* bufData = buf.Data();
-          size_t length = buf.Length();
-          data = [NSData dataWithBytes:bufData length:(NSUInteger)length];
-        } else if (val.IsString()) {
-          NSString* str = [NSString stringWithUTF8String:val.ToString().Utf8Value().c_str()];
-          data = [str dataUsingEncoding:NSUTF8StringEncoding];
-        } else {
-          std::stringstream ss;
-          ss << "arguments type mismatch, arguments[" << i << "]." << e.first.ToString().Utf8Value()
-             << " must be Buffer | string";
-          throw Napi::Error::New(info.Env(), ss.str());
+        NSData* data = _createNsDataFromNapiValue(e.second.AsValue());
+        if (!data) {
+          throw Napi::TypeError::New(
+            info.Env(),
+            fmt::format("arguments type mismatch, arguments[{}].{} must be Buffer | string", i, e.first.ToString().Utf8Value())
+          );
         }
 
 #if DEBUG
@@ -205,24 +175,37 @@ Napi::Value writeVariadicPasteboardItems(const CallbackInfo& info) {
 #ifdef DEBUG
     NSLog(@"NSPasteboard.generalPasteboard.writeObjects(%zu): result = %i", items.count, success);
 #endif
-    return Napi::Boolean::New(env, success);
+    return Napi::Boolean::New(info.Env(), success);
+  }
+}
+
+// [NSPasteboard declareTypes:owner:] 是极早期版本的 macOS API
+// 它对字符串的格式校验非常宽松，允许通过传统的非 UTI 字符串来建立剪贴板通道。
+Napi::Value declareTypeAndSetData(const CallbackInfo& info) {
+  @autoreleasepool {
+    _validateArgs(info, {"string", "Buffer|string"});
+    NSString* format = _createNsString(info[0]);
+    NSData* data = _createNsDataFromNapiValue(info[1]);
+    [NSPasteboard.generalPasteboard declareTypes:@[ format ] owner:nil];
+    bool success = [NSPasteboard.generalPasteboard setData:data forType:format];
+    return Napi::Boolean::From(info.Env(), success);
   }
 }
 #endif
 
-Object Init(Env env, Object exports) {
+Napi::Object Init(Napi::Env env, Napi::Object exports) {
   Napi::HandleScope scope(env);
 #ifdef __APPLE__
   // clear
-  exports.Set(String::New(env, "clearContents"), Function::New(env, clearContents));
+  exports.Set("clearContents", Function::New(env, clearContents));
 
   // read
-  exports.Set(String::New(env, "readBuffer"), Function::New(env, readBuffer));
-  exports.Set(String::New(env, "readBuffers"), Function::New(env, readBuffers)); // array
+  exports.Set("readBuffer", Function::New(env, readBuffer));
+  exports.Set("readBuffers", Function::New(env, readBuffers)); // array
 
   // write
-  exports.Set(String::New(env, "writeVariadicPasteboardItems"),
-              Function::New(env, writeVariadicPasteboardItems)); // [item1, item2]
+  exports.Set("writeVariadicPasteboardItems", Function::New(env, writeVariadicPasteboardItems)); // [item1, item2]
+  exports.Set("declareTypeAndSetData", Function::New(env, declareTypeAndSetData));
 #endif
   return exports;
 }
