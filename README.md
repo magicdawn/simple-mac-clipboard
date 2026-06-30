@@ -87,9 +87,9 @@ clip.writePasteboardItems([
 
 #### `declareTypeAndSetData`
 
-> write single item with invalid UTI
-> [NSPasteboard declareTypes:owner:] 是极早期版本的 macOS API
-> 它对字符串的格式校验非常宽松，允许通过传统的非 UTI 字符串来建立剪贴板通道。
+> write single item. this method using `NSPasteboard.declareTypes` which supports non-UTI format
+> for example `NTPathFinderFilenamesPboardType` equals `dyn.ah62d4rv4gu8y6zcuqf4guvxmr3wgn6wgrf0gn5xbrzw1gydcr7u1e3cytf2gn`
+> see https://stackoverflow.com/questions/8003919/are-dynamic-utis-stable & https://alastairs-place.net/blog/2012/06/06/utis-are-better-than-you-think-and-heres-why/
 
 ```ts
 // typedef
