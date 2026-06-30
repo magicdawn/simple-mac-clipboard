@@ -43,7 +43,8 @@
     "test": "vitest --run --fileParallelism=false",
     "prepublishOnly": "pnpm build:fat-addon && pnpm build:tsdown && pnpm test",
     "test-with-debug": "pnpm build:addon --debug && pnpm test",
-    "test-cover": "pnpm test -- --coverage"
+    "test-cover": "pnpm test -- --coverage",
+    "install": "node ./dist/index.js >/dev/null 2>&1 || npm run build:addon"
   },
   "dependencies": {
     "bindings": "^1.5.0",

@@ -15,7 +15,18 @@ export type Addon = {
 
 const require = createRequire(import.meta.filename)
 
-function tryAddon() {
+function tryBuildRelease() {
+  try {
+    return {
+      path: join(import.meta.dirname, '../build/Release/simple_mac_clipboard.node'),
+      ...require('../build/Release/simple_mac_clipboard.node'),
+    }
+  } catch {
+    return
+  }
+}
+
+function tryFatNode() {
   try {
     return {
       path: join(import.meta.dirname, '../simple_mac_clipboard.node'),
@@ -26,4 +37,4 @@ function tryAddon() {
   }
 }
 
-export const addon: Addon = tryAddon() || bindings('simple_mac_clipboard')
+export const addon: Addon = tryBuildRelease() || tryFatNode() || bindings('simple_mac_clipboard')
