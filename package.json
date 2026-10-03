@@ -1,7 +1,7 @@
 {
   "name": "simple-mac-clipboard",
   "type": "module",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "packageManager": "pnpm@12.8.2",
   "description": "simple mac clipboard for node & electron",
   "author": "magicdawn",
