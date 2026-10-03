@@ -37,4 +37,9 @@ function tryFatNode() {
   }
 }
 
-export const addon: Addon = tryBuildRelease() || tryFatNode() || bindings('simple_mac_clipboard')
+// manual set
+function tryGlobal() {
+  return (globalThis as any)[Symbol.for('simple_mac_clipboard.node')] as Addon | undefined
+}
+
+export const addon: Addon = tryGlobal() || tryBuildRelease() || tryFatNode() || bindings('simple_mac_clipboard')

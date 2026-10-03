@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import clip, { FORMAT_PLAIN_TEXT } from '../dist'
+import clip, { FORMAT_PLAIN_TEXT } from '../src-ts'
 import { pbpasteRead } from './helpers/external-pbpaste'
 
 describe('write', () => {

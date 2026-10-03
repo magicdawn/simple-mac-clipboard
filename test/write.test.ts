@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import {
   declareTypeAndSetData,
+  FORMAT_FILE_URL,
   FORMAT_PLAIN_TEXT,
   readBuffer,
   readText,
   readTexts,
   writeFormat,
   writePasteboardItems,
-} from '../dist'
+} from '../src-ts'
 import { pbpasteRead } from './helpers/external-pbpaste'
 
 describe('.writeFormat(Buffer)', () => {
@@ -48,6 +49,12 @@ describe('.writePasteboardItems', () => {
   it('works', () => {
     writePasteboardItems({ [FORMAT_PLAIN_TEXT]: '1' }, { [FORMAT_PLAIN_TEXT]: '2' })
     expect(readTexts(FORMAT_PLAIN_TEXT)).toEqual(['1', '2'])
+  })
+
+  it('works for multiple items', () => {
+    writePasteboardItems([{ [FORMAT_PLAIN_TEXT]: '1' }, { [FORMAT_FILE_URL]: import.meta.url }])
+    expect(readTexts(FORMAT_PLAIN_TEXT)).toEqual(['1'])
+    expect(readTexts(FORMAT_FILE_URL)).toEqual([import.meta.url])
   })
 })
 

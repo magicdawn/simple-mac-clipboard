@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { clear, FORMAT_PLAIN_TEXT, readBuffer, readText, readTexts } from '../dist'
-import { writeFormat } from '../src-ts'
+import { clear, FORMAT_PLAIN_TEXT, readBuffer, readText, readTexts, writeFormat } from '../src-ts'
 import { pbcopy } from './helpers/external-pbcopy'
 import { pbpasteRead } from './helpers/external-pbpaste'
 
